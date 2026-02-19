@@ -1,6 +1,7 @@
 package me.son14ka.mineChess;
 
 import com.github.bhlangonijr.chesslib.Piece;
+import com.github.bhlangonijr.chesslib.Side;
 import com.github.retrooper.packetevents.util.Vector3f;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -179,7 +180,7 @@ public class RenderViewManager {
                             continue;
                         }
                         if (row == to[0] && col == to[1]) {
-                            Piece pawn = pending.side().isWhite() ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
+                            Piece pawn = pending.side() == Side.WHITE ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
                             spawnPiece(game, row, col, pawn);
                             continue;
                         }

@@ -252,11 +252,11 @@ public class BoardClickListener implements Listener {
                 Location fireworkLoc = origin.clone().add(xOffset, 0.5, zOffset);
 
                 for (Player nearby : getNearbyPlayers(origin, 3.0)) {
-                    nearby.spawnParticle(Particle.FIREWORKS_SPARK, fireworkLoc, 30, 0.2, 0.2, 0.2, 0.02);
+                    nearby.spawnParticle(Particle.FIREWORK, fireworkLoc, 30, 0.2, 0.2, 0.2, 0.02);
                     nearby.spawnParticle(Particle.FLASH, fireworkLoc, 1, 0, 0, 0, 0);
-                    nearby.spawnParticle(Particle.REDSTONE, fireworkLoc, 20, 0.25, 0.25, 0.25, 0.0,
+                    nearby.spawnParticle(Particle.DUST, fireworkLoc, 20, 0.25, 0.25, 0.25, 0.0,
                             new Particle.DustOptions(black, 1.0f));
-                    nearby.spawnParticle(Particle.REDSTONE, fireworkLoc, 20, 0.25, 0.25, 0.25, 0.0,
+                    nearby.spawnParticle(Particle.DUST, fireworkLoc, 20, 0.25, 0.25, 0.25, 0.0,
                             new Particle.DustOptions(white, 1.0f));
                     nearby.playSound(fireworkLoc, Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.3f, 1.0f);
                 }
