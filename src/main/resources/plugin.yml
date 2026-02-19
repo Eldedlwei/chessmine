@@ -8,7 +8,7 @@ softdepend: [ Vault ]
 commands:
   chess:
     description: MineChess commands
-    usage: /chess <bet|resign|reload>
+    usage: /chess <bet|resign|reload|help>
 permissions:
   minechess.reload:
     description: Reload MineChess messages

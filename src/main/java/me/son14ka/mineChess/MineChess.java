@@ -74,7 +74,9 @@ public final class MineChess extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new HighlightCleanupListener(boardClickListener), this);
         var cmd = getCommand("chess");
         if (cmd != null) {
-            cmd.setExecutor(new ChessCommand(this, gameManager, gameStorage));
+            ChessCommand chessCommand = new ChessCommand(this, gameManager, gameStorage);
+            cmd.setExecutor(chessCommand);
+            cmd.setTabCompleter(chessCommand);
         }
     }
 

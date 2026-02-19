@@ -5,9 +5,17 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ChessCommand implements CommandExecutor {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
+public class ChessCommand implements CommandExecutor, TabCompleter {
     private final MineChess plugin;
     private final GameManager gameManager;
     private final GameStorage storage;
@@ -26,11 +34,16 @@ public class ChessCommand implements CommandExecutor {
         }
 
         if (args.length == 0) {
-            player.sendMessage(plugin.getMessageService().msg(player, "command_usage"));
+            sendHelp(player);
             return true;
         }
 
-        String sub = args[0].toLowerCase();
+        String sub = normalizeSubcommand(args[0]);
+        if (sub.equals("help")) {
+            sendHelp(player);
+            return true;
+        }
+
         if (sub.equals("resign")) {
             if (!player.hasPermission("minechess.resign")) {
                 player.sendMessage(plugin.getMessageService().msg(player, "no_permission"));
@@ -57,6 +70,7 @@ public class ChessCommand implements CommandExecutor {
                 player.sendMessage(plugin.getMessageService().msg(player, "no_permission"));
                 return true;
             }
+            plugin.reloadConfig();
             plugin.getMessageService().reload();
             player.sendMessage(plugin.getMessageService().msg(player, "reload_done"));
             return true;
@@ -108,7 +122,83 @@ public class ChessCommand implements CommandExecutor {
             return true;
         }
 
-        player.sendMessage(plugin.getMessageService().msg(player, "command_usage"));
+        player.sendMessage(plugin.getMessageService().msg(player, "command_unknown"));
+        sendHelp(player);
         return true;
+    }
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        if (!(sender instanceof Player player)) {
+            return Collections.emptyList();
+        }
+
+        boolean zhLocale = player.locale().toLanguageTag().toLowerCase(Locale.ROOT).startsWith("zh");
+        if (args.length == 1) {
+            List<String> subs = new ArrayList<>();
+            addSubcommandsByPermission(player, zhLocale, subs);
+            return filterByPrefix(subs, args[0]);
+        }
+
+        String sub = normalizeSubcommand(args[0]);
+        if (args.length == 2 && sub.equals("bet") && player.hasPermission("minechess.bet")) {
+            String min = String.valueOf(plugin.getConfig().getDouble("bet.min-amount", 0.0));
+            return filterByPrefix(List.of(min, "10", "100", "1000"), args[1]);
+        }
+        return Collections.emptyList();
+    }
+
+    private void sendHelp(Player player) {
+        player.sendMessage(plugin.getMessageService().msg(player, "help_header"));
+        if (player.hasPermission("minechess.bet")) {
+            player.sendMessage(plugin.getMessageService().msg(player, "help_bet"));
+        }
+        if (player.hasPermission("minechess.resign")) {
+            player.sendMessage(plugin.getMessageService().msg(player, "help_resign"));
+        }
+        if (player.hasPermission("minechess.reload")) {
+            player.sendMessage(plugin.getMessageService().msg(player, "help_reload"));
+        }
+        player.sendMessage(plugin.getMessageService().msg(player, "help_help"));
+    }
+
+    private void addSubcommandsByPermission(Player player, boolean zhLocale, List<String> subs) {
+        if (player.hasPermission("minechess.bet")) {
+            subs.add("bet");
+            if (zhLocale) subs.add("下注");
+        }
+        if (player.hasPermission("minechess.resign")) {
+            subs.add("resign");
+            if (zhLocale) subs.add("认输");
+        }
+        if (player.hasPermission("minechess.reload")) {
+            subs.add("reload");
+            if (zhLocale) subs.add("重载");
+        }
+        subs.add("help");
+        subs.add("?");
+        if (zhLocale) subs.add("帮助");
+    }
+
+    private List<String> filterByPrefix(List<String> values, String prefix) {
+        String normalized = prefix.toLowerCase(Locale.ROOT);
+        List<String> result = new ArrayList<>();
+        for (String value : values) {
+            if (value.toLowerCase(Locale.ROOT).startsWith(normalized)) {
+                result.add(value);
+            }
+        }
+        return result;
+    }
+
+    private String normalizeSubcommand(String raw) {
+        String lower = raw.toLowerCase(Locale.ROOT);
+        return switch (lower) {
+            case "bet", "下注" -> "bet";
+            case "resign", "认输" -> "resign";
+            case "reload", "重载" -> "reload";
+            case "help", "?", "帮助" -> "help";
+            default -> lower;
+        };
     }
 }

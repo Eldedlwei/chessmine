@@ -7,3 +7,5 @@ disconnect:
   loss-seconds: 30
 bet:
   min-amount: 0.0
+debug:
+  turn-logging: false

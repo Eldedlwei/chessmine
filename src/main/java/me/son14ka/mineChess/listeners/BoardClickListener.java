@@ -74,7 +74,7 @@ public class BoardClickListener implements Listener {
             ChessGame game = gameManager.getGame(gameId);
             if (game == null) return;
 
-            completePromotion(game, row, col, cmd);
+            completePromotion(game, player, row, col, cmd);
 
             cleanupPromotionEntities(interaction.getWorld(), gameId);
 
@@ -121,14 +121,14 @@ public class BoardClickListener implements Listener {
             if (piece == Piece.NONE) return;
 
             if (piece.getPieceSide() != board.getSideToMove()) {
-                Component playerColor = game.getCurrentTurn().equals("white") ? messages.msg(player, "white") : messages.msg(player, "black");
-                player.sendMessage(messages.msg(player, "turn_info", Placeholder.component("color", playerColor)));
+                debugTurn(game, player, "reject_select_wrong_side");
+                player.sendMessage(messages.msg(player, "turn_info", Placeholder.component("color", currentTurnColor(player, board))));
                 return;
             }
             Side playerSide = game.getPlayerSide(player.getUniqueId());
             if (playerSide != null && playerSide != board.getSideToMove()) {
-                Component playerColor = game.getCurrentTurn().equals("white") ? messages.msg(player, "white") : messages.msg(player, "black");
-                player.sendMessage(messages.msg(player, "turn_info", Placeholder.component("color", playerColor)));
+                debugTurn(game, player, "reject_player_not_turn");
+                player.sendMessage(messages.msg(player, "turn_info", Placeholder.component("color", currentTurnColor(player, board))));
                 return;
             }
 
@@ -225,9 +225,13 @@ public class BoardClickListener implements Listener {
             return;
         }
 
-        board.doMove(move, true);
+        if (!board.doMove(move, true)) {
+            player.sendMessage(messages.msg(player, "wrong_cell"));
+            return;
+        }
         Side moverSide = board.getSideToMove() == Side.WHITE ? Side.BLACK : Side.WHITE;
         game.addIncrement(moverSide);
+        debugTurn(game, player, "move_applied");
 
         movePieceEntity(game, fromR, fromC, toR, toC, isCapture, isEnPassant ? fromR : toR, toC);
 
@@ -378,7 +382,7 @@ public class BoardClickListener implements Listener {
         }
     }
 
-    private void completePromotion(ChessGame game, int row, int col, int cmd) {
+    private void completePromotion(ChessGame game, Player player, int row, int col, int cmd) {
         ChessGame.PendingPromotion pending = game.getPendingPromotion();
         if (pending == null) return;
 
@@ -396,6 +400,7 @@ public class BoardClickListener implements Listener {
             return;
         }
         game.addIncrement(side);
+        debugTurn(game, player, "promotion_applied");
 
         if (storage != null) storage.saveGame(game);
     }
@@ -450,6 +455,23 @@ public class BoardClickListener implements Listener {
             GameManager.broadcastToGame(game, msg);
             player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BONE_BLOCK_PLACE, 1.0f, 1.0f);
         }
+    }
+
+    private Component currentTurnColor(Player player, Board board) {
+        return board.getSideToMove() == Side.WHITE ? messages.msg(player, "white") : messages.msg(player, "black");
+    }
+
+    private void debugTurn(ChessGame game, Player player, String stage) {
+        if (!plugin.getConfig().getBoolean("debug.turn-logging", false)) {
+            return;
+        }
+        Side turn = game.getBoard().getSideToMove();
+        Side playerSide = game.getPlayerSide(player.getUniqueId());
+        plugin.getLogger().info("[MineChess][turn] stage=" + stage
+                + " game=" + game.getGameId()
+                + " player=" + player.getName()
+                + " playerSide=" + (playerSide == null ? "NONE" : playerSide.name())
+                + " sideToMove=" + turn.name());
     }
 
     private boolean ensurePlayerAssigned(ChessGame game, Player player) {
