@@ -1,0 +1,30 @@
+name: MineChess
+version: '1.0'
+main: me.son14ka.mineChess.MineChess
+api-version: '1.21'
+authors: [ SON14KA ]
+depend: [ PacketEvents ]
+softdepend: [ Vault ]
+commands:
+  chess:
+    description: MineChess commands
+    usage: /chess <bet|resign|reload>
+permissions:
+  minechess.reload:
+    description: Reload MineChess messages
+    default: op
+  minechess.bet:
+    description: Place bets
+    default: true
+  minechess.resign:
+    description: Resign from a game
+    default: true
+  minechess.play:
+    description: Play a game (select/move pieces)
+    default: true
+  minechess.create:
+    description: Place a chess board
+    default: true
+  minechess.break:
+    description: Break a chess board
+    default: true

@@ -1,0 +1,7 @@
+clock:
+  initial-seconds: 300
+  increment-seconds: 3
+disconnect:
+  loss-seconds: 30
+bet:
+  min-amount: 0.0

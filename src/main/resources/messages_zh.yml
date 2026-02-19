@@ -1,0 +1,26 @@
+messages:
+  black: "<gray>黑方</gray>"
+  white: "<white>白方</white>"
+  turn_info: "<yellow>轮到<color>走子！</yellow>"
+  mate_broadcast: "<gold>将死！<winner>获胜。</gold>"
+  check_warning: "<red>不能这样走：你的国王正被将军或将被将军！</red>"
+  wrong_cell: "<yellow>这个格子不能走，请选择其他格。</yellow>"
+  promotion_choice: "<red>请先选择升变的棋子！</red>"
+  game_over: "<red>本局已结束！请开始新局。</red>"
+  check_notification: "<yellow><color>，你的国王被将军了！</yellow>"
+  stalemate_broadcast: "<gold>和棋！</gold>"
+  insufficient_material: "<gold>和棋：子力不足。</gold>"
+  no_game: "<red>未找到进行中的对局。</red>"
+  not_player: "<red>你不是这局的玩家。</red>"
+  need_opponent: "<yellow>等待对手加入。</yellow>"
+  need_bets: "<yellow>双方需在开始前下注。</yellow>"
+  bet_invalid: "<red>下注金额无效。</red>"
+  bet_set: "<green>下注金额已设置为 <amount>。</green>"
+  bet_locked: "<red>本局下注已锁定。</red>"
+  bet_insufficient: "<red>余额不足，无法锁定下注。</red>"
+  resign_broadcast: "<yellow><player> 已认输。</yellow>"
+  timeout_broadcast: "<yellow><winner> 超时获胜。</yellow>"
+  disconnect_loss: "<yellow><player> 断线判负。</yellow>"
+  command_usage: '<yellow>用法：/chess bet <amount> | /chess resign | /chess reload</yellow>'
+  reload_done: '<green>语言文件已重载。</green>'
+  no_permission: '<red>你没有权限。</red>'

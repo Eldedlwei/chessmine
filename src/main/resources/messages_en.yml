@@ -1,0 +1,26 @@
+messages:
+  black: "<gray>Black</gray>"
+  white: "<white>White</white>"
+  turn_info: "<yellow>It's <color>'s move!</yellow>"
+  mate_broadcast: "<gold>Checkmate! <winner> wins.</gold>"
+  check_warning: "<red>You can't make this move: your king is under attack or will be!</red>"
+  wrong_cell: "<yellow>You can't make this move, choose another cell.</yellow>"
+  promotion_choice: "<red>First choose a piece to promote to!</red>"
+  game_over: "<red>The game is already over! Start a new one.</red>"
+  check_notification: "<yellow><color>, your king has been checked! Be careful!</yellow>"
+  stalemate_broadcast: "<gold>Stalemate! It's a draw!</gold>"
+  insufficient_material: "<gold>Draw: insufficient material.</gold>"
+  no_game: "<red>No active game found.</red>"
+  not_player: "<red>You are not a player in this game.</red>"
+  need_opponent: "<yellow>Waiting for opponent to join.</yellow>"
+  need_bets: "<yellow>Both players must place bets before starting.</yellow>"
+  bet_invalid: "<red>Invalid bet amount.</red>"
+  bet_set: "<green>Bet set to <amount>.</green>"
+  bet_locked: "<red>Bets are locked for this game.</red>"
+  bet_insufficient: "<red>Not enough balance to lock bets.</red>"
+  resign_broadcast: "<yellow><player> resigned.</yellow>"
+  timeout_broadcast: "<yellow><winner> wins on time.</yellow>"
+  disconnect_loss: "<yellow><player> disconnected and lost.</yellow>"
+  command_usage: '<yellow>Usage: /chess bet <amount> | /chess resign | /chess reload</yellow>'
+  reload_done: '<green>Messages reloaded.</green>'
+  no_permission: '<red>You do not have permission.</red>'

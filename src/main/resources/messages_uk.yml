@@ -1,0 +1,26 @@
+messages:
+  black: "<gray>Black</gray>"
+  white: "<white>White</white>"
+  turn_info: "<yellow>§·?§Õ <color>!</yellow>"
+  mate_broadcast: "<gold>§®§Ñ§ä! §±§Ö§â§Ö§Þ§à§Ø§Ö§è§î: <winner>.</gold>"
+  check_warning: "<red>§£§Ú §ß§Ö §Þ§à§Ø§Ö§ä§Ö §Ù§â§à§Ò§Ú§ä§Ú §è§Ö§Û §ç?§Õ: §Ü§à§â§à§Ý§î §á?§Õ §Ñ§ä§Ñ§Ü§à§ð §Ñ§Ò§à §Ò§å§Õ§Ö §á?§Õ §Ñ§ä§Ñ§Ü§à§ð!</red>"
+  wrong_cell: "<yellow>§¯§Ö§Ó?§â§ß§Ñ §Ü§Ý?§ä§Ú§ß§Ü§Ñ, §à§Ò§Ö§â?§ä§î ?§ß§ê§å.</yellow>"
+  promotion_choice: "<red>§³§á§à§é§Ñ§ä§Ü§å §à§Ò§Ö§â?§ä§î §æ?§Ô§å§â§å §Õ§Ý§ñ §á§Ö§â§Ö§ä§Ó§à§â§Ö§ß§ß§ñ!</red>"
+  game_over: "<red>§¤§â§Ñ §Ó§Ø§Ö §Ù§Ñ§Ó§Ö§â§ê§Ö§ß§Ñ! §±§à§é§ß?§ä§î §ß§à§Ó§å.</red>"
+  check_notification: "<yellow><color>, §Ó§Ñ§ê §Ü§à§â§à§Ý§î §á?§Õ §ê§Ñ§ç§à§Þ! §¢§å§Õ§î§ä§Ö §à§Ò§Ö§â§Ö§Ø§ß?!</yellow>"
+  stalemate_broadcast: "<gold>§±§Ñ§ä! §¯?§é§Ú§ñ.</gold>"
+  insufficient_material: "<gold>§¯?§é§Ú§ñ: §ß§Ö§Õ§à§ã§ä§Ñ§ä§ß§î§à §Þ§Ñ§ä§Ö§â?§Ñ§Ý§å.</gold>"
+  no_game: "<red>§¡§Ü§ä§Ú§Ó§ß§å §Ô§â§å §ß§Ö §Ù§ß§Ñ§Û§Õ§Ö§ß§à.</red>"
+  not_player: "<red>§£§Ú §ß§Ö §Ô§â§Ñ§Ó§Ö§è§î §å §è?§Û §Ô§â?.</red>"
+  need_opponent: "<yellow>§°§é?§Ü§å§Ó§Ñ§ß§ß§ñ §ã§å§á§Ö§â§ß§Ú§Ü§Ñ.</yellow>"
+  need_bets: "<yellow>§°§Ò§Ú§Õ§Ó§Ñ §Ô§â§Ñ§Ó§è? §á§à§Ó§Ú§ß§ß? §Ù§â§à§Ò§Ú§ä§Ú §ã§ä§Ñ§Ó§Ü§å §á§Ö§â§Ö§Õ §á§à§é§Ñ§ä§Ü§à§Þ.</yellow>"
+  bet_invalid: "<red>§¯§Ö§Ó?§â§ß§Ñ §ã§å§Þ§Ñ §ã§ä§Ñ§Ó§Ü§Ú.</red>"
+  bet_set: "<green>§³§ä§Ñ§Ó§Ü§Ñ §Ó§ã§ä§Ñ§ß§à§Ó§Ý§Ö§ß§Ñ: <amount>.</green>"
+  bet_locked: "<red>§³§ä§Ñ§Ó§Ü§Ú §Ó§Ø§Ö §Ù§Ñ§Ò§Ý§à§Ü§à§Ó§Ñ§ß?.</red>"
+  bet_insufficient: "<red>§¯§Ö§Õ§à§ã§ä§Ñ§ä§ß§î§à §Ü§à§ê§ä?§Ó §Õ§Ý§ñ §ã§ä§Ñ§Ó§Ü§Ú.</red>"
+  resign_broadcast: "<yellow><player> §Ù§Õ§Ñ§Ó§ã§ñ.</yellow>"
+  timeout_broadcast: "<yellow><winner> §Ó§Ú§Ô§â§Ñ§Ó §á§à §é§Ñ§ã§å.</yellow>"
+  disconnect_loss: "<yellow><player> §Ó?§Õ§Ü§Ý§ð§é§Ú§Ó§ã§ñ ? §á§â§à§Ô§â§Ñ§Ó.</yellow>"
+  command_usage: '<yellow>§£§Ú§Ü§à§â§Ú§ã§ä§Ñ§ß§ß§ñ: /chess bet <amount> | /chess resign | /chess reload</yellow>'
+  reload_done: '<green>§±§à§Ó?§Õ§à§Þ§Ý§Ö§ß§ß§ñ §á§Ö§â§Ö§Ù§Ñ§Ó§Ñ§ß§ä§Ñ§Ø§Ö§ß§à.</green>'
+  no_permission: '<red>§µ §Ó§Ñ§ã §ß§Ö§Þ§Ñ? §á§â§Ñ§Ó.</red>'
