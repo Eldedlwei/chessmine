@@ -6,7 +6,6 @@ import com.github.bhlangonijr.chesslib.PieceType;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
-import de.cubbossa.cliententities.PlayerSpace;
 import me.son14ka.mineChess.ChessGame;
 import me.son14ka.mineChess.ChessMapping;
 import me.son14ka.mineChess.GameManager;
@@ -16,6 +15,7 @@ import me.son14ka.mineChess.GameEconomy;
 import me.son14ka.mineChess.GameStorage;
 import me.son14ka.mineChess.PromotionSpawner;
 import me.son14ka.mineChess.MessageService;
+import me.son14ka.mineChess.ViewSpace;
 import org.bukkit.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -31,7 +31,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.*;
 
 public class BoardClickListener implements Listener {
@@ -307,13 +306,13 @@ public class BoardClickListener implements Listener {
 
         HighlightSpace highlightSpace = activeHighlights.get(player.getUniqueId());
         if (highlightSpace == null) {
-            highlightSpace = new HighlightSpace(PlayerSpace.create().withPlayer(player).build(), new ArrayList<>());
+            highlightSpace = new HighlightSpace(new ViewSpace(plugin, player), new ArrayList<>());
             activeHighlights.put(player.getUniqueId(), highlightSpace);
         }
         clearHighlights(player);
 
         List<ItemDisplay> highlights = new ArrayList<>();
-        PlayerSpace playerSpace = highlightSpace.space;
+        ViewSpace playerSpace = highlightSpace.space;
         Set<Square> seen = new HashSet<>();
 
         for (Move move : moves) {
@@ -358,11 +357,7 @@ public class BoardClickListener implements Listener {
         if (highlights != null) {
             highlights.displays.forEach(Entity::remove);
             highlights.space.announce();
-            try {
-                highlights.space.close();
-            } catch (IOException e) {
-                plugin.getLogger().warning("Failed to close highlight PlayerSpace: " + e.getMessage());
-            }
+            highlights.space.close();
         }
         highlightKeys.remove(playerId);
     }
@@ -510,10 +505,10 @@ public class BoardClickListener implements Listener {
     }
 
     private static final class HighlightSpace {
-        private final PlayerSpace space;
+        private final ViewSpace space;
         private List<ItemDisplay> displays;
 
-        private HighlightSpace(PlayerSpace space, List<ItemDisplay> displays) {
+        private HighlightSpace(ViewSpace space, List<ItemDisplay> displays) {
             this.space = space;
             this.displays = displays;
         }

@@ -1,7 +1,6 @@
 package me.son14ka.mineChess;
 
 import com.github.bhlangonijr.chesslib.Piece;
-import de.cubbossa.cliententities.PlayerSpace;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.BlockDisplay;
@@ -11,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Transformation;
 
-import java.io.IOException;
 import java.util.*;
 
 public class RenderViewManager {
@@ -101,14 +99,14 @@ public class RenderViewManager {
                 if (!playerViews.containsKey(playerId)) {
                     Player player = plugin.getServer().getPlayer(playerId);
                     if (player != null && player.isOnline()) {
-                    PlayerView view = new PlayerView(player);
-                    view.spawnBoard(game);
-                    view.refreshPieces(game);
-                    view.announce();
-                    playerViews.put(playerId, view);
+                        PlayerView view = new PlayerView(plugin, player);
+                        view.spawnBoard(game);
+                        view.refreshPieces(game);
+                        view.announce();
+                        playerViews.put(playerId, view);
+                    }
                 }
             }
-        }
         }
 
         private void refresh(ChessGame game) {
@@ -134,14 +132,14 @@ public class RenderViewManager {
     }
 
     private static final class PlayerView {
-        private final PlayerSpace space;
+        private final ViewSpace space;
         private final List<BlockDisplay> boardDisplays = new ArrayList<>();
         private final List<ItemDisplay> pieceDisplays = new ArrayList<>();
         private String lastFen;
         private String lastPendingKey;
 
-        private PlayerView(Player player) {
-            this.space = PlayerSpace.create().withPlayer(player).build();
+        private PlayerView(MineChess plugin, Player player) {
+            this.space = new ViewSpace(plugin, player);
         }
 
         private void spawnBoard(ChessGame game) {
@@ -245,10 +243,7 @@ public class RenderViewManager {
             }
             boardDisplays.clear();
             space.announce();
-            try {
-                space.close();
-            } catch (IOException ignored) {
-            }
+            space.close();
         }
     }
 }
