@@ -39,7 +39,11 @@ public class MessageService {
             case "zh" -> zhConfig;
             default -> enConfig;
         };
-        String raw = config.getString("messages." + path, "<red>Missing key: " + path);
+        String key = "messages." + path;
+        String raw = config.getString(key);
+        if (raw == null) {
+            raw = enConfig.getString(key, "<red>Missing key: " + path);
+        }
         return mini.deserialize(raw, placeholders);
     }
 }
