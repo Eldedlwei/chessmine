@@ -28,7 +28,7 @@ public class MessageService {
     }
 
     public Component msg(Player player, String path, TagResolver... placeholders) {
-        String rawLocale = player.getLocale().toLowerCase();
+        String rawLocale = player.locale().toLanguageTag().toLowerCase();
         String locale;
         if (rawLocale.startsWith("uk")) locale = "uk";
         else if (rawLocale.startsWith("zh")) locale = "zh";

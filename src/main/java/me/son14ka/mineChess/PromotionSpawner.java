@@ -9,6 +9,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Transformation;
 
+import java.util.List;
+
 public final class PromotionSpawner {
     private PromotionSpawner() {
     }
@@ -26,7 +28,9 @@ public final class PromotionSpawner {
             choiceLoc.getWorld().spawn(choiceLoc, ItemDisplay.class, display -> {
                 ItemStack item = new ItemStack(Material.TORCH);
                 var meta = item.getItemMeta();
-                meta.setCustomModelData(cmd);
+                var modelData = meta.getCustomModelDataComponent();
+                modelData.setFloats(List.of((float) cmd));
+                meta.setCustomModelDataComponent(modelData);
                 item.setItemMeta(meta);
                 display.setItemStack(item);
 

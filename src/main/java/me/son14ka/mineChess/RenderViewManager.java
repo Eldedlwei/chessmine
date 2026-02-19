@@ -210,7 +210,9 @@ public class RenderViewManager {
             ItemStack item = new ItemStack(Material.TORCH);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                meta.setCustomModelData(cmd);
+                var modelData = meta.getCustomModelDataComponent();
+                modelData.setFloats(List.of((float) cmd));
+                meta.setCustomModelDataComponent(modelData);
                 item.setItemMeta(meta);
             }
             int displayId = space.spawnItemDisplay(loc, item, PIECE_SCALE);

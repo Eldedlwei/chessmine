@@ -9,13 +9,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.List;
+
 public class ChessBoardItem {
 
     public static ItemStack createTemplate() {
         ItemStack item = new ItemStack(Material.ITEM_FRAME);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setCustomModelData(1);
+            var modelData = meta.getCustomModelDataComponent();
+            modelData.setFloats(List.of(1f));
+            meta.setCustomModelDataComponent(modelData);
 
             meta.itemName(Component.translatable("item.minechess.board")
                     .decoration(TextDecoration.ITALIC, false)

@@ -9,6 +9,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.List;
+
 public class ChessBookItem {
 
     public static ItemStack create() {
@@ -16,7 +18,9 @@ public class ChessBookItem {
         ItemMeta meta = book.getItemMeta();
 
         if (meta != null) {
-            meta.setCustomModelData(2);
+            var modelData = meta.getCustomModelDataComponent();
+            modelData.setFloats(List.of(2f));
+            meta.setCustomModelDataComponent(modelData);
 
             meta.itemName(Component.translatable("item.minechess.chess_tutorial")
                     .decoration(TextDecoration.ITALIC, false)

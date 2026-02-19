@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Location;
 
-import java.util.UUID;
-
 public class ChessGame {
     private final UUID gameId;
     private final Location origin;
