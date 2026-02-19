@@ -1,14 +1,12 @@
 package me.son14ka.mineChess;
 
 import com.github.bhlangonijr.chesslib.Piece;
+import com.github.retrooper.packetevents.util.Vector3f;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.BlockDisplay;
-import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.util.Transformation;
 
 import java.util.*;
 
@@ -133,10 +131,12 @@ public class RenderViewManager {
 
     private static final class PlayerView {
         private final ViewSpace space;
-        private final List<BlockDisplay> boardDisplays = new ArrayList<>();
-        private final List<ItemDisplay> pieceDisplays = new ArrayList<>();
+        private final List<Integer> boardDisplays = new ArrayList<>();
+        private final List<Integer> pieceDisplays = new ArrayList<>();
         private String lastFen;
         private String lastPendingKey;
+        private static final Vector3f BOARD_SCALE = new Vector3f(0.25f, 0.05f, 0.25f);
+        private static final Vector3f PIECE_SCALE = new Vector3f(0.25f, 0.25f, 0.25f);
 
         private PlayerView(MineChess plugin, Player player) {
             this.space = new ViewSpace(plugin, player);
@@ -148,14 +148,8 @@ public class RenderViewManager {
                 for (int col = 0; col < 8; col++) {
                     Location cellLoc = baseLoc.clone().add(col / 4.0, 0, row / 4.0);
                     Material material = (row + col) % 2 == 0 ? Material.BIRCH_PLANKS : Material.DARK_OAK_PLANKS;
-
-                    BlockDisplay display = space.spawn(cellLoc, BlockDisplay.class);
-                    display.setBlock(material.createBlockData());
-                    Transformation trafo = display.getTransformation();
-                    trafo.getScale().set(0.25f, 0.05f, 0.25f);
-                    display.setTransformation(trafo);
-
-                    boardDisplays.add(display);
+                    int displayId = space.spawnBlockDisplay(cellLoc, material, BOARD_SCALE);
+                    boardDisplays.add(displayId);
                 }
             }
         }
@@ -169,8 +163,8 @@ public class RenderViewManager {
             lastFen = fen;
             lastPendingKey = pendingKey;
 
-            for (ItemDisplay display : pieceDisplays) {
-                display.remove();
+            for (int displayId : pieceDisplays) {
+                space.destroy(displayId);
             }
             pieceDisplays.clear();
 
@@ -212,21 +206,14 @@ public class RenderViewManager {
             else if (cmd == 8) loc.setYaw(90f);
             else loc.setYaw(piece.getPieceSide().isWhite() ? 0f : 180f);
 
-            ItemDisplay display = space.spawn(loc, ItemDisplay.class);
-
             ItemStack item = new ItemStack(Material.TORCH);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
                 meta.setCustomModelData(cmd);
                 item.setItemMeta(meta);
             }
-            display.setItemStack(item);
-
-            Transformation trafo = display.getTransformation();
-            trafo.getScale().set(0.25f, 0.25f, 0.25f);
-            display.setTransformation(trafo);
-
-            pieceDisplays.add(display);
+            int displayId = space.spawnItemDisplay(loc, item, PIECE_SCALE);
+            pieceDisplays.add(displayId);
         }
 
         private void announce() {
@@ -234,12 +221,12 @@ public class RenderViewManager {
         }
 
         private void close() {
-            for (ItemDisplay display : pieceDisplays) {
-                display.remove();
+            for (int displayId : pieceDisplays) {
+                space.destroy(displayId);
             }
             pieceDisplays.clear();
-            for (BlockDisplay display : boardDisplays) {
-                display.remove();
+            for (int displayId : boardDisplays) {
+                space.destroy(displayId);
             }
             boardDisplays.clear();
             space.announce();

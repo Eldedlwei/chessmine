@@ -6,6 +6,7 @@ import com.github.bhlangonijr.chesslib.PieceType;
 import com.github.bhlangonijr.chesslib.Side;
 import com.github.bhlangonijr.chesslib.Square;
 import com.github.bhlangonijr.chesslib.move.Move;
+import com.github.retrooper.packetevents.util.Vector3f;
 import me.son14ka.mineChess.ChessGame;
 import me.son14ka.mineChess.ChessMapping;
 import me.son14ka.mineChess.GameManager;
@@ -17,23 +18,22 @@ import me.son14ka.mineChess.PromotionSpawner;
 import me.son14ka.mineChess.MessageService;
 import me.son14ka.mineChess.ViewSpace;
 import org.bukkit.*;
+import org.bukkit.entity.Entity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
-import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.util.Transformation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class BoardClickListener implements Listener {
+    private static final Vector3f HIGHLIGHT_SCALE = new Vector3f(0.25f, 0.25f, 0.25f);
 
     private final MineChess plugin;
     private final GameManager gameManager;
@@ -311,7 +311,7 @@ public class BoardClickListener implements Listener {
         }
         clearHighlights(player);
 
-        List<ItemDisplay> highlights = new ArrayList<>();
+        List<Integer> highlights = new ArrayList<>();
         ViewSpace playerSpace = highlightSpace.space;
         Set<Square> seen = new HashSet<>();
 
@@ -325,15 +325,8 @@ public class BoardClickListener implements Listener {
 
             Location loc = game.getOrigin().clone().add(c / 4.0 + 0.125, 0.051, r / 4.0 + 0.125);
 
-            ItemDisplay display = playerSpace.spawn(loc, ItemDisplay.class);
-            display.setItemStack(new ItemStack(Material.LIME_STAINED_GLASS_PANE));
-
-            Transformation trafo = display.getTransformation();
-            trafo.getScale().set(0.25f, 0.25f, 0.25f);
-            trafo.getLeftRotation().rotateX((float) Math.toRadians(90));
-            display.setTransformation(trafo);
-
-            highlights.add(display);
+            int displayId = playerSpace.spawnItemDisplay(loc, new ItemStack(Material.LIME_STAINED_GLASS_PANE), HIGHLIGHT_SCALE);
+            highlights.add(displayId);
         }
         playerSpace.announce();
         highlightSpace.displays = highlights;
@@ -345,7 +338,7 @@ public class BoardClickListener implements Listener {
     private void clearHighlights(Player player) {
         HighlightSpace highlights = activeHighlights.remove(player.getUniqueId());
         if (highlights != null) {
-            highlights.displays.forEach(Entity::remove);
+            highlights.displays.forEach(highlights.space::destroy);
             highlights.space.announce();
             activeHighlights.put(player.getUniqueId(), highlights);
         }
@@ -355,7 +348,7 @@ public class BoardClickListener implements Listener {
     public void closeHighlights(UUID playerId) {
         HighlightSpace highlights = activeHighlights.remove(playerId);
         if (highlights != null) {
-            highlights.displays.forEach(Entity::remove);
+            highlights.displays.forEach(highlights.space::destroy);
             highlights.space.announce();
             highlights.space.close();
         }
@@ -506,9 +499,9 @@ public class BoardClickListener implements Listener {
 
     private static final class HighlightSpace {
         private final ViewSpace space;
-        private List<ItemDisplay> displays;
+        private List<Integer> displays;
 
-        private HighlightSpace(ViewSpace space, List<ItemDisplay> displays) {
+        private HighlightSpace(ViewSpace space, List<Integer> displays) {
             this.space = space;
             this.displays = displays;
         }
