@@ -26,13 +26,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class BoardClickListener implements Listener {
-    private static final Vector3f HIGHLIGHT_SCALE = new Vector3f(0.25f, 0.015f, 0.25f);
+    private static final Vector3f HIGHLIGHT_SCALE = new Vector3f(0.25f, 0.25f, 0.25f);
 
     private final MineChess plugin;
     private final GameManager gameManager;
@@ -320,9 +321,9 @@ public class BoardClickListener implements Listener {
             int r = coords[0];
             int c = coords[1];
 
-            Location loc = game.getOrigin().clone().add(c / 4.0, 0.051, r / 4.0);
-
-            int displayId = playerSpace.spawnBlockDisplay(loc, Material.LIME_STAINED_GLASS, HIGHLIGHT_SCALE);
+            Location loc = game.getOrigin().clone().add(c / 4.0 + 0.125, 0.051, r / 4.0 + 0.125);
+            loc.setPitch(90f);
+            int displayId = playerSpace.spawnItemDisplay(loc, new ItemStack(Material.LIME_STAINED_GLASS_PANE), HIGHLIGHT_SCALE);
             highlights.add(displayId);
         }
         playerSpace.announce();
