@@ -12,7 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 
 public class RenderViewManager {
-    private static final double VIEW_RADIUS = 3.0;
+    private static final double VIEW_RADIUS = 50.0;
 
     private final MineChess plugin;
     private final GameManager gameManager;
