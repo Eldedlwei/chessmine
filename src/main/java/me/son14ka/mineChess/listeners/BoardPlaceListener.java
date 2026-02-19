@@ -8,7 +8,6 @@ import me.son14ka.mineChess.BoardSpawner;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.hanging.HangingPlaceEvent;
@@ -44,12 +43,7 @@ public class BoardPlaceListener implements Listener {
         if (meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
             event.getEntity().remove();
 
-            BlockFace face = event.getBlockFace();
-            Location startLoc = event.getBlock().getLocation().add(
-                    face.getModX(),
-                    face.getModY(),
-                    face.getModZ()
-            );
+            Location startLoc = event.getBlock().getLocation();
             ChessGame game = gameManager.createGame(startLoc);
 
             buildChessBoard(startLoc, game);
