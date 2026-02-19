@@ -12,6 +12,11 @@ public class GameStorage {
     private final String jdbcUrl;
 
     public GameStorage(File dataFolder) {
+        try {
+            Class.forName("org.h2.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("H2 JDBC driver not found in plugin jar", e);
+        }
         this.jdbcUrl = "jdbc:h2:file:" + new File(dataFolder, "minechess").getAbsolutePath();
     }
 
