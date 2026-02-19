@@ -1,26 +1,26 @@
 messages:
   black: "<gray>Black</gray>"
   white: "<white>White</white>"
-  turn_info: "<yellow>งท?งี <color>!</yellow>"
-  mate_broadcast: "<gold>งฎงังไ! งฑงึงโงึงÞงเงุงึง่ง๎: <winner>.</gold>"
-  check_warning: "<red>งฃงฺ ง฿งึ งÞงเงุงึงไงึ งูงโงเงางฺงไงฺ ง่งึงÛ ง็?งี: งÜงเงโงเงÝง๎ งแ?งี งังไงังÜงเง๐ งังางเ งางๅงีงึ งแ?งี งังไงังÜงเง๐!</red>"
-  wrong_cell: "<yellow>งฏงึงำ?งโง฿งั งÜงÝ?งไงฺง฿งÜงั, งเงางึงโ?งไง๎ ?ง฿ง๊งๅ.</yellow>"
-  promotion_choice: "<red>งณงแงเง้งังไงÜงๅ งเงางึงโ?งไง๎ งๆ?งิงๅงโงๅ งีงÝง๑ งแงึงโงึงไงำงเงโงึง฿ง฿ง๑!</red>"
-  game_over: "<red>งคงโงั งำงุงึ งูงังำงึงโง๊งึง฿งั! งฑงเง้ง฿?งไง๎ ง฿งเงำงๅ.</red>"
-  check_notification: "<yellow><color>, งำงัง๊ งÜงเงโงเงÝง๎ งแ?งี ง๊งัง็งเงÞ! งขงๅงีง๎งไงึ งเงางึงโงึงุง฿?!</yellow>"
-  stalemate_broadcast: "<gold>งฑงังไ! งฏ?ง้งฺง๑.</gold>"
-  insufficient_material: "<gold>งฏ?ง้งฺง๑: ง฿งึงีงเงใงไงังไง฿ง๎งเ งÞงังไงึงโ?งังÝงๅ.</gold>"
-  no_game: "<red>งกงÜงไงฺงำง฿งๅ งิงโงๅ ง฿งึ งูง฿งังÛงีงึง฿งเ.</red>"
-  not_player: "<red>งฃงฺ ง฿งึ งิงโงังำงึง่ง๎ งๅ ง่?งÛ งิงโ?.</red>"
-  need_opponent: "<yellow>งฐง้?งÜงๅงำงัง฿ง฿ง๑ งใงๅงแงึงโง฿งฺงÜงั.</yellow>"
-  need_bets: "<yellow>งฐงางฺงีงำงั งิงโงังำง่? งแงเงำงฺง฿ง฿? งูงโงเงางฺงไงฺ งใงไงังำงÜงๅ งแงึงโงึงี งแงเง้งังไงÜงเงÞ.</yellow>"
-  bet_invalid: "<red>งฏงึงำ?งโง฿งั งใงๅงÞงั งใงไงังำงÜงฺ.</red>"
-  bet_set: "<green>งณงไงังำงÜงั งำงใงไงัง฿งเงำงÝงึง฿งั: <amount>.</green>"
-  bet_locked: "<red>งณงไงังำงÜงฺ งำงุงึ งูงังางÝงเงÜงเงำงัง฿?.</red>"
-  bet_insufficient: "<red>งฏงึงีงเงใงไงังไง฿ง๎งเ งÜงเง๊งไ?งำ งีงÝง๑ งใงไงังำงÜงฺ.</red>"
-  resign_broadcast: "<yellow><player> งูงีงังำงใง๑.</yellow>"
-  timeout_broadcast: "<yellow><winner> งำงฺงิงโงังำ งแงเ ง้งังใงๅ.</yellow>"
-  disconnect_loss: "<yellow><player> งำ?งีงÜงÝง๐ง้งฺงำงใง๑ ? งแงโงเงิงโงังำ.</yellow>"
-  command_usage: '<yellow>งฃงฺงÜงเงโงฺงใงไงัง฿ง฿ง๑: /chess bet <amount> | /chess resign | /chess reload</yellow>'
-  reload_done: '<green>งฑงเงำ?งีงเงÞงÝงึง฿ง฿ง๑ งแงึงโงึงูงังำงัง฿งไงังุงึง฿งเ.</green>'
-  no_permission: '<red>งต งำงังใ ง฿งึงÞงั? งแงโงังำ.</red>'
+  turn_info: "<yellow>ะฅ?ะด <color>!</yellow>"
+  mate_broadcast: "<gold>ะะฐั! ะะตั€ะตะผะพะถะตัั: <winner>.</gold>"
+  check_warning: "<red>ะ’ะธ ะฝะต ะผะพะถะตัะต ะทั€ะพะฑะธัะธ ัะตะน ั…?ะด: ะบะพั€ะพะปั ะฟ?ะด ะฐัะฐะบะพั ะฐะฑะพ ะฑัะดะต ะฟ?ะด ะฐัะฐะบะพั!</red>"
+  wrong_cell: "<yellow>ะะตะฒ?ั€ะฝะฐ ะบะป?ัะธะฝะบะฐ, ะพะฑะตั€?ัั ?ะฝัั.</yellow>"
+  promotion_choice: "<red>ะกะฟะพัะฐัะบั ะพะฑะตั€?ัั ั?ะณัั€ั ะดะปั ะฟะตั€ะตัะฒะพั€ะตะฝะฝั!</red>"
+  game_over: "<red>ะ“ั€ะฐ ะฒะถะต ะทะฐะฒะตั€ัะตะฝะฐ! ะะพัะฝ?ัั ะฝะพะฒั.</red>"
+  check_notification: "<yellow><color>, ะฒะฐั ะบะพั€ะพะปั ะฟ?ะด ัะฐั…ะพะผ! ะ‘ัะดััะต ะพะฑะตั€ะตะถะฝ?!</yellow>"
+  stalemate_broadcast: "<gold>ะะฐั! ะ?ัะธั.</gold>"
+  insufficient_material: "<gold>ะ?ัะธั: ะฝะตะดะพััะฐัะฝัะพ ะผะฐัะตั€?ะฐะปั.</gold>"
+  no_game: "<red>ะะบัะธะฒะฝั ะณั€ั ะฝะต ะทะฝะฐะนะดะตะฝะพ.</red>"
+  not_player: "<red>ะ’ะธ ะฝะต ะณั€ะฐะฒะตัั ั ั?ะน ะณั€?.</red>"
+  need_opponent: "<yellow>ะั?ะบัะฒะฐะฝะฝั ััะฟะตั€ะฝะธะบะฐ.</yellow>"
+  need_bets: "<yellow>ะะฑะธะดะฒะฐ ะณั€ะฐะฒั? ะฟะพะฒะธะฝะฝ? ะทั€ะพะฑะธัะธ ััะฐะฒะบั ะฟะตั€ะตะด ะฟะพัะฐัะบะพะผ.</yellow>"
+  bet_invalid: "<red>ะะตะฒ?ั€ะฝะฐ ััะผะฐ ััะฐะฒะบะธ.</red>"
+  bet_set: "<green>ะกัะฐะฒะบะฐ ะฒััะฐะฝะพะฒะปะตะฝะฐ: <amount>.</green>"
+  bet_locked: "<red>ะกัะฐะฒะบะธ ะฒะถะต ะทะฐะฑะปะพะบะพะฒะฐะฝ?.</red>"
+  bet_insufficient: "<red>ะะตะดะพััะฐัะฝัะพ ะบะพัั?ะฒ ะดะปั ััะฐะฒะบะธ.</red>"
+  resign_broadcast: "<yellow><player> ะทะดะฐะฒัั.</yellow>"
+  timeout_broadcast: "<yellow><winner> ะฒะธะณั€ะฐะฒ ะฟะพ ัะฐัั.</yellow>"
+  disconnect_loss: "<yellow><player> ะฒ?ะดะบะปััะธะฒัั ? ะฟั€ะพะณั€ะฐะฒ.</yellow>"
+  command_usage: '<yellow>ะ’ะธะบะพั€ะธััะฐะฝะฝั: /chess bet <amount> | /chess resign | /chess reload</yellow>'
+  reload_done: '<green>ะะพะฒ?ะดะพะผะปะตะฝะฝั ะฟะตั€ะตะทะฐะฒะฐะฝัะฐะถะตะฝะพ.</green>'
+  no_permission: '<red>ะฃ ะฒะฐั ะฝะตะผะฐ? ะฟั€ะฐะฒ.</red>'
