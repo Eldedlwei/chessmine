@@ -320,7 +320,7 @@ public class BoardClickListener implements Listener {
             int r = coords[0];
             int c = coords[1];
 
-            Location loc = game.getOrigin().clone().add(c / 4.0 + 0.125, 0.051, r / 4.0 + 0.125);
+            Location loc = game.getOrigin().clone().add(c / 4.0, 0.051, r / 4.0);
 
             int displayId = playerSpace.spawnBlockDisplay(loc, Material.LIME_STAINED_GLASS, HIGHLIGHT_SCALE);
             highlights.add(displayId);
