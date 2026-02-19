@@ -17,13 +17,11 @@ import java.util.UUID;
 public class PlayerSessionListener implements Listener {
     private final MineChess plugin;
     private final GameManager gameManager;
-    private final GameStorage storage;
     private final Map<UUID, BukkitTask> quitTasks = new HashMap<>();
 
     public PlayerSessionListener(MineChess plugin, GameManager gameManager, GameStorage storage) {
         this.plugin = plugin;
         this.gameManager = gameManager;
-        this.storage = storage;
     }
 
     @EventHandler
@@ -43,8 +41,9 @@ public class PlayerSessionListener implements Listener {
 
             Component msg = plugin.getMessageService().msg(player, "disconnect_loss", Placeholder.unparsed("player", player.getName()));
             GameManager.broadcastToGame(stillGame, msg);
+            GameManager.broadcastToGame(stillGame, plugin.getMessageService().msg(player, "board_reset"));
             GameEconomy.payoutWinner(plugin, stillGame, winnerSide);
-            if (storage != null) storage.saveGame(stillGame);
+            gameManager.resetGame(stillGame);
         }, delaySeconds * 20L);
 
         quitTasks.put(player.getUniqueId(), task);

@@ -24,3 +24,7 @@ messages:
   command_usage: '<yellow>Використання: /chess bet <amount> | /chess resign | /chess reload</yellow>'
   reload_done: '<green>Пов?домлення перезавантажено.</green>'
   no_permission: '<red>У вас нема? прав.</red>'
+  joined_white: "<green>You joined as White.</green>"
+  joined_black: "<green>You joined as Black.</green>"
+  start_timeout: "<yellow>Game canceled: start conditions were not met within 60 seconds.</yellow>"
+  board_reset: "<yellow>Board has been reset. Click the board to join a new game.</yellow>"

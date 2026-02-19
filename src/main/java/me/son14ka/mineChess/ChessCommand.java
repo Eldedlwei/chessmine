@@ -46,8 +46,9 @@ public class ChessCommand implements CommandExecutor {
             var winnerSide = side == com.github.bhlangonijr.chesslib.Side.WHITE ? com.github.bhlangonijr.chesslib.Side.BLACK : com.github.bhlangonijr.chesslib.Side.WHITE;
             Component msg = plugin.getMessageService().msg(player, "resign_broadcast", Placeholder.unparsed("player", player.getName()));
             GameManager.broadcastToGame(game, msg);
+            GameManager.broadcastToGame(game, plugin.getMessageService().msg(player, "board_reset"));
             GameEconomy.payoutWinner(plugin, game, winnerSide);
-            storage.saveGame(game);
+            gameManager.resetGame(game);
             return true;
         }
 

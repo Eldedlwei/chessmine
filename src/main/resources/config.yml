@@ -1,6 +1,8 @@
 clock:
   initial-seconds: 300
   increment-seconds: 3
+start:
+  wait-seconds: 60
 disconnect:
   loss-seconds: 30
 bet:

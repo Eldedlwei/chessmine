@@ -13,6 +13,7 @@ import java.util.UUID;
 import org.bukkit.Location;
 
 public class ChessGame {
+    private static final String START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     private final UUID gameId;
     private final Location origin;
     private final Board board = new Board();
@@ -30,11 +31,13 @@ public class ChessGame {
     private boolean blackBetConfirmed;
     private boolean betLocked;
     private boolean started;
+    private long waitingStartSinceMs;
     private final MoveCache moveCache = new MoveCache();
 
     public ChessGame(UUID gameId, Location origin) {
         this.gameId = gameId;
         this.origin = origin;
+        resetForNextMatch();
     }
 
     public void setWaitingForPromotion(boolean waiting) { isWaitingForPromotion = waiting; }
@@ -78,6 +81,8 @@ public class ChessGame {
     public void setBetLocked(boolean betLocked) { this.betLocked = betLocked; }
     public boolean isStarted() { return started; }
     public void setStarted(boolean started) { this.started = started; }
+    public long getWaitingStartSinceMs() { return waitingStartSinceMs; }
+    public void setWaitingStartSinceMs(long waitingStartSinceMs) { this.waitingStartSinceMs = waitingStartSinceMs; }
     public boolean areBetsConfirmed() { return whiteBetConfirmed && blackBetConfirmed; }
     public void addIncrement(Side side) {
         if (side == Side.WHITE) whiteTimeMs += incrementMs;
@@ -94,6 +99,25 @@ public class ChessGame {
 
     public Side getCurrentTurnSide() {
         return board.getSideToMove();
+    }
+
+    public void resetForNextMatch() {
+        board.loadFromFen(START_FEN);
+        pendingPromotion = null;
+        isWaitingForPromotion = false;
+        isGameOver = false;
+        whitePlayer = null;
+        blackPlayer = null;
+        whiteTimeMs = 0L;
+        blackTimeMs = 0L;
+        incrementMs = 0L;
+        whiteBet = 0.0;
+        blackBet = 0.0;
+        whiteBetConfirmed = false;
+        blackBetConfirmed = false;
+        betLocked = false;
+        started = false;
+        waitingStartSinceMs = 0L;
     }
 
     public record PendingPromotion(Square from, Square to, Side side) {

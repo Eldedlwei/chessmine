@@ -3,6 +3,7 @@ package me.son14ka.mineChess;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collection;
@@ -76,8 +77,38 @@ public class GameManager {
         });
     }
 
+    public void resetGame(ChessGame game) {
+        cleanupPromotionEntities(game);
+        game.resetForNextMatch();
+
+        if (plugin.getRenderViewManager() != null) {
+            plugin.getRenderViewManager().refreshGame(game);
+        }
+        if (plugin.getGameStorage() != null) {
+            plugin.getGameStorage().saveGame(game);
+        }
+    }
+
+    private void cleanupPromotionEntities(ChessGame game) {
+        NamespacedKey gameKey = new NamespacedKey(plugin, "game_id");
+        NamespacedKey promoItemKey = new NamespacedKey(plugin, "is_promotion_item");
+        NamespacedKey promoCmdKey = new NamespacedKey(plugin, "promotion_cmd");
+        String targetGameId = game.getGameId().toString();
+
+        for (Entity entity : game.getOrigin().getWorld().getEntities()) {
+            var pdc = entity.getPersistentDataContainer();
+            String gameId = pdc.get(gameKey, PersistentDataType.STRING);
+            if (!targetGameId.equals(gameId)) {
+                continue;
+            }
+            if (pdc.has(promoItemKey, PersistentDataType.BYTE) || pdc.has(promoCmdKey, PersistentDataType.INTEGER)) {
+                entity.remove();
+            }
+        }
+    }
+
     public static void broadcastToGame(ChessGame game, Component message) {
-        double radius = 3.0;
+        double radius = 50.0;
         Location center = game.getOrigin();
 
         center.getWorld().getNearbyPlayers(center, radius).forEach(player -> {

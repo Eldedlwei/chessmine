@@ -17,8 +17,33 @@ public class GameClockManager {
     }
 
     public void tick() {
+        long startWaitMs = plugin.getConfig().getLong("start.wait-seconds", 60L) * 1000L;
+        long now = System.currentTimeMillis();
         for (ChessGame game : gameManager.getActiveGames()) {
-            if (!game.isStarted() || game.isGameOver()) continue;
+            if (game.isGameOver()) continue;
+
+            if (!game.isStarted()) {
+                long waitingSince = game.getWaitingStartSinceMs();
+                if (waitingSince > 0L && now - waitingSince >= startWaitMs) {
+                    game.setGameOver(true);
+                    var white = plugin.getServer().getPlayer(game.getWhitePlayer());
+                    if (white != null) {
+                        white.sendMessage(plugin.getMessageService().msg(white, "start_timeout"));
+                        white.sendMessage(plugin.getMessageService().msg(white, "board_reset"));
+                    }
+                    var black = plugin.getServer().getPlayer(game.getBlackPlayer());
+                    if (black != null) {
+                        black.sendMessage(plugin.getMessageService().msg(black, "start_timeout"));
+                        black.sendMessage(plugin.getMessageService().msg(black, "board_reset"));
+                    }
+                    if (game.isBetLocked()) {
+                        GameEconomy.refundBets(plugin, game);
+                    }
+                    gameManager.resetGame(game);
+                }
+                continue;
+            }
+
             Side side = game.getCurrentTurnSide();
             game.decrementTime(side, 1000L);
 
@@ -39,7 +64,9 @@ public class GameClockManager {
             String winnerName = winner.getName();
             Component msg = plugin.getMessageService().msg(winner, "timeout_broadcast", Placeholder.unparsed("winner", winnerName));
             GameManager.broadcastToGame(game, msg);
+            GameManager.broadcastToGame(game, plugin.getMessageService().msg(winner, "board_reset"));
         }
         GameEconomy.payoutWinner(plugin, game, winnerSide);
+        gameManager.resetGame(game);
     }
 }

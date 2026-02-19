@@ -157,6 +157,10 @@ public final class MineChess extends JavaPlugin {
         return messageService;
     }
 
+    public RenderViewManager getRenderViewManager() {
+        return renderViewManager;
+    }
+
     private void saveResourceIfAbsent(String resourcePath) {
         if (!new File(getDataFolder(), resourcePath).exists()) {
             saveResource(resourcePath, false);

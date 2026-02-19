@@ -24,3 +24,7 @@ messages:
   command_usage: '<yellow>ç”¨æ³•ï¼š/chess bet <amount> | /chess resign | /chess reload</yellow>'
   reload_done: '<green>è¯­è¨€æ–‡ä»¶å·²é‡è½½ã€‚</green>'
   no_permission: '<red>ä½ æ²¡æœ‰æƒé™ã€‚</red>'
+  joined_white: "<green>ÄãÒÑ¼ÓÈë°×·½¡£</green>"
+  joined_black: "<green>ÄãÒÑ¼ÓÈëºÚ·½¡£</green>"
+  start_timeout: "<yellow>1·ÖÖÓÄÚÎ´Âú×ã¿ª¾ÖÌõ¼ş£¬¶Ô¾ÖÒÑÈ¡Ïû¡£</yellow>"
+  board_reset: "<yellow>ÆåÅÌÒÑÖØÖÃ£¬µã»÷ÆåÅÌ¿É¿ªÊ¼ĞÂ¶Ô¾Ö¡£</yellow>"

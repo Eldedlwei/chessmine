@@ -419,10 +419,14 @@ public class BoardClickListener implements Listener {
 
             Component msg;
             if (isMated) {
-                Component winner = board.getSideToMove() == Side.WHITE ? messages.msg(player, "black") : messages.msg(player, "white");
+                Side winnerSide = board.getSideToMove() == Side.WHITE ? Side.BLACK : Side.WHITE;
+                Player winnerPlayer = plugin.getServer().getPlayer(game.getPlayer(winnerSide));
+                Component winner = winnerPlayer != null
+                        ? Component.text(winnerPlayer.getName())
+                        : (winnerSide == Side.WHITE ? messages.msg(player, "white") : messages.msg(player, "black"));
                 msg = messages.msg(player, "mate_broadcast", Placeholder.component("winner", winner));
                 spawnVictoryFireworks(game.getOrigin());
-                GameEconomy.payoutWinner(plugin, game, board.getSideToMove() == Side.WHITE ? Side.BLACK : Side.WHITE);
+                GameEconomy.payoutWinner(plugin, game, winnerSide);
             } else if (isStalemate) {
                 msg = messages.msg(player, "stalemate_broadcast");
                 spawnAmbientSmoke(game.getOrigin());
@@ -434,6 +438,8 @@ public class BoardClickListener implements Listener {
             }
 
             GameManager.broadcastToGame(game, msg);
+            GameManager.broadcastToGame(game, messages.msg(player, "board_reset"));
+            gameManager.resetGame(game);
             return;
         }
 
@@ -451,6 +457,10 @@ public class BoardClickListener implements Listener {
             game.setWhitePlayer(player.getUniqueId());
             game.setWhiteTimeMs(getInitialTimeMs());
             game.setIncrementMs(getIncrementMs());
+            if (game.getWaitingStartSinceMs() <= 0L) {
+                game.setWaitingStartSinceMs(System.currentTimeMillis());
+            }
+            player.sendMessage(messages.msg(player, "joined_white"));
             if (storage != null) storage.saveGame(game);
             return true;
         }
@@ -458,6 +468,10 @@ public class BoardClickListener implements Listener {
             game.setBlackPlayer(player.getUniqueId());
             game.setBlackTimeMs(getInitialTimeMs());
             game.setIncrementMs(getIncrementMs());
+            if (game.getWaitingStartSinceMs() <= 0L) {
+                game.setWaitingStartSinceMs(System.currentTimeMillis());
+            }
+            player.sendMessage(messages.msg(player, "joined_black"));
             if (storage != null) storage.saveGame(game);
             return true;
         }
@@ -485,6 +499,7 @@ public class BoardClickListener implements Listener {
             }
         }
         game.setStarted(true);
+        game.setWaitingStartSinceMs(0L);
         if (storage != null) storage.saveGame(game);
         return true;
     }
