@@ -205,7 +205,7 @@ public class RenderViewManager {
 
             if (cmd == 2) loc.setYaw(-90f);
             else if (cmd == 8) loc.setYaw(90f);
-            else loc.setYaw(piece.getPieceSide().isWhite() ? 0f : 180f);
+            else loc.setYaw(piece.getPieceSide() == Side.WHITE ? 0f : 180f);
 
             ItemStack item = new ItemStack(Material.TORCH);
             ItemMeta meta = item.getItemMeta();
