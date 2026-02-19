@@ -43,7 +43,8 @@ public class BoardPlaceListener implements Listener {
         if (meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
             event.getEntity().remove();
 
-            Location startLoc = event.getBlock().getLocation();
+            // Anchor the board on top of the support block to avoid clipping into it.
+            Location startLoc = event.getBlock().getLocation().add(0.0, 1.0, 0.0);
             ChessGame game = gameManager.createGame(startLoc);
 
             buildChessBoard(startLoc, game);
