@@ -10,7 +10,7 @@ public final class GameEconomy {
 
     public static boolean lockBets(MineChess plugin, ChessGame game) {
         Economy economy = plugin.getEconomy();
-        if (economy == null) return true;
+        if (economy == null) return false;
 
         Player white = plugin.getServer().getPlayer(game.getWhitePlayer());
         Player black = plugin.getServer().getPlayer(game.getBlackPlayer());

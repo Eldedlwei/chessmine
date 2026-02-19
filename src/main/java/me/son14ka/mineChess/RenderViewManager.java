@@ -133,7 +133,8 @@ public class RenderViewManager {
     private static final class PlayerView {
         private final ViewSpace space;
         private final List<Integer> boardDisplays = new ArrayList<>();
-        private final List<Integer> pieceDisplays = new ArrayList<>();
+        private final Map<Integer, Integer> pieceDisplays = new HashMap<>();
+        private final Map<Integer, PieceRender> pieceRenders = new HashMap<>();
         private String lastFen;
         private String lastPendingKey;
         private static final Vector3f BOARD_SCALE = new Vector3f(0.25f, 0.05f, 0.25f);
@@ -164,33 +165,38 @@ public class RenderViewManager {
             lastFen = fen;
             lastPendingKey = pendingKey;
 
-            for (int displayId : pieceDisplays) {
-                space.destroy(displayId);
-            }
-            pieceDisplays.clear();
+            Map<Integer, PieceRender> target = buildTargetRenders(game);
+            Set<Integer> cells = new HashSet<>();
+            cells.addAll(pieceDisplays.keySet());
+            cells.addAll(target.keySet());
 
-            ChessGame.PendingPromotion pending = game.getPendingPromotion();
+            for (Integer cell : cells) {
+                PieceRender currentRender = pieceRenders.get(cell);
+                PieceRender targetRender = target.get(cell);
+                Integer currentDisplay = pieceDisplays.get(cell);
 
-            for (int row = 0; row < 8; row++) {
-                for (int col = 0; col < 8; col++) {
-                    if (pending != null) {
-                        int[] from = ChessMapping.toCoords(pending.from());
-                        int[] to = ChessMapping.toCoords(pending.to());
-                        if (row == from[0] && col == from[1]) {
-                            continue;
-                        }
-                        if (row == to[0] && col == to[1]) {
-                            Piece pawn = pending.side() == Side.WHITE ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
-                            spawnPiece(game, row, col, pawn);
-                            continue;
-                        }
+                if (targetRender == null) {
+                    if (currentDisplay != null) {
+                        space.destroy(currentDisplay);
                     }
-
-                    Piece piece = game.getBoard().getPiece(ChessMapping.toSquare(row, col));
-                    if (piece == Piece.NONE) continue;
-
-                    spawnPiece(game, row, col, piece);
+                    pieceDisplays.remove(cell);
+                    pieceRenders.remove(cell);
+                    continue;
                 }
+
+                if (targetRender.equals(currentRender) && currentDisplay != null) {
+                    continue;
+                }
+
+                if (currentDisplay != null) {
+                    space.destroy(currentDisplay);
+                }
+
+                int row = cell / 8;
+                int col = cell % 8;
+                int displayId = spawnPiece(game, row, col, targetRender);
+                pieceDisplays.put(cell, displayId);
+                pieceRenders.put(cell, targetRender);
             }
         }
 
@@ -199,24 +205,61 @@ public class RenderViewManager {
             return pending.from().name() + "-" + pending.to().name() + "-" + pending.side().name();
         }
 
-        private void spawnPiece(ChessGame game, int row, int col, Piece piece) {
-            int cmd = ChessMapping.toModelData(piece);
-            Location loc = game.getOrigin().clone().add(col / 4.0 + 0.125, 0.137, row / 4.0 + 0.125);
+        private Map<Integer, PieceRender> buildTargetRenders(ChessGame game) {
+            Map<Integer, PieceRender> target = new HashMap<>();
+            ChessGame.PendingPromotion pending = game.getPendingPromotion();
+            int[] pendingFrom = null;
+            int[] pendingTo = null;
+            if (pending != null) {
+                pendingFrom = ChessMapping.toCoords(pending.from());
+                pendingTo = ChessMapping.toCoords(pending.to());
+            }
 
-            if (cmd == 2) loc.setYaw(-90f);
-            else if (cmd == 8) loc.setYaw(90f);
-            else loc.setYaw(piece.getPieceSide() == Side.WHITE ? 0f : 180f);
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    Piece piece = game.getBoard().getPiece(ChessMapping.toSquare(row, col));
+
+                    if (pending != null) {
+                        if (row == pendingFrom[0] && col == pendingFrom[1]) {
+                            piece = Piece.NONE;
+                        } else if (row == pendingTo[0] && col == pendingTo[1]) {
+                            piece = pending.side() == Side.WHITE ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
+                        }
+                    }
+
+                    if (piece == Piece.NONE) {
+                        continue;
+                    }
+
+                    int cell = row * 8 + col;
+                    target.put(cell, toRender(piece));
+                }
+            }
+            return target;
+        }
+
+        private PieceRender toRender(Piece piece) {
+            int cmd = ChessMapping.toModelData(piece);
+            float yaw;
+            if (cmd == 2) yaw = -90f;
+            else if (cmd == 8) yaw = 90f;
+            else yaw = piece.getPieceSide() == Side.WHITE ? 0f : 180f;
+            return new PieceRender(cmd, yaw);
+        }
+
+        private int spawnPiece(ChessGame game, int row, int col, PieceRender render) {
+            Location loc = game.getOrigin().clone().add(col / 4.0 + 0.125, 0.137, row / 4.0 + 0.125);
+            loc.setYaw(render.yaw());
 
             ItemStack item = new ItemStack(Material.TORCH);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
                 var modelData = meta.getCustomModelDataComponent();
-                modelData.setFloats(List.of((float) cmd));
+                modelData.setFloats(List.of((float) render.cmd()));
                 meta.setCustomModelDataComponent(modelData);
                 item.setItemMeta(meta);
             }
-            int displayId = space.spawnItemDisplay(loc, item, PIECE_SCALE);
-            pieceDisplays.add(displayId);
+            return space.spawnItemDisplay(loc, item, PIECE_SCALE);
         }
 
         private void announce() {
@@ -224,16 +267,20 @@ public class RenderViewManager {
         }
 
         private void close() {
-            for (int displayId : pieceDisplays) {
+            for (int displayId : pieceDisplays.values()) {
                 space.destroy(displayId);
             }
             pieceDisplays.clear();
+            pieceRenders.clear();
             for (int displayId : boardDisplays) {
                 space.destroy(displayId);
             }
             boardDisplays.clear();
             space.announce();
             space.close();
+        }
+
+        private record PieceRender(int cmd, float yaw) {
         }
     }
 }

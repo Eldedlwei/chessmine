@@ -15,6 +15,8 @@ messages:
   need_opponent: "<yellow>Waiting for opponent to join.</yellow>"
   need_bets: "<yellow>Both players must place bets before starting.</yellow>"
   bet_invalid: "<red>Invalid bet amount.</red>"
+  bet_range: "<red>Bet must be between <min> and <max>.</red>"
+  bet_requires_vault: "<red>Vault economy is required for betting.</red>"
   bet_set: "<green>Bet set to <amount>.</green>"
   bet_locked: "<red>Bets are locked for this game.</red>"
   bet_insufficient: "<red>Not enough balance to lock bets.</red>"

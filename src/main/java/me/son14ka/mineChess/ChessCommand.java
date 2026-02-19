@@ -81,6 +81,10 @@ public class ChessCommand implements CommandExecutor, TabCompleter {
                 player.sendMessage(plugin.getMessageService().msg(player, "no_permission"));
                 return true;
             }
+            if (plugin.getEconomy() == null) {
+                player.sendMessage(plugin.getMessageService().msg(player, "bet_requires_vault"));
+                return true;
+            }
             if (args.length < 2) {
                 player.sendMessage(plugin.getMessageService().msg(player, "command_usage"));
                 return true;
@@ -92,8 +96,19 @@ public class ChessCommand implements CommandExecutor, TabCompleter {
                 player.sendMessage(plugin.getMessageService().msg(player, "bet_invalid"));
                 return true;
             }
-            if (amount < plugin.getConfig().getDouble("bet.min-amount", 0.0)) {
-                player.sendMessage(plugin.getMessageService().msg(player, "bet_invalid"));
+            double minAmount = plugin.getConfig().getDouble("bet.min-amount", 100.0);
+            double maxAmount = plugin.getConfig().getDouble("bet.max-amount", 1000.0);
+            if (amount < minAmount || amount > maxAmount) {
+                player.sendMessage(plugin.getMessageService().msg(
+                        player,
+                        "bet_range",
+                        Placeholder.unparsed("min", String.valueOf(minAmount)),
+                        Placeholder.unparsed("max", String.valueOf(maxAmount))
+                ));
+                return true;
+            }
+            if (!plugin.getEconomy().has(player, amount)) {
+                player.sendMessage(plugin.getMessageService().msg(player, "bet_insufficient"));
                 return true;
             }
             ChessGame game = gameManager.getNearestGame(player.getLocation(), 4.0);
@@ -142,8 +157,9 @@ public class ChessCommand implements CommandExecutor, TabCompleter {
 
         String sub = normalizeSubcommand(args[0]);
         if (args.length == 2 && sub.equals("bet") && player.hasPermission("minechess.bet")) {
-            String min = String.valueOf(plugin.getConfig().getDouble("bet.min-amount", 0.0));
-            return filterByPrefix(List.of(min, "10", "100", "1000"), args[1]);
+            String min = String.valueOf(plugin.getConfig().getDouble("bet.min-amount", 100.0));
+            String max = String.valueOf(plugin.getConfig().getDouble("bet.max-amount", 1000.0));
+            return filterByPrefix(List.of(min, "100", "500", max), args[1]);
         }
         return Collections.emptyList();
     }

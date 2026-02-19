@@ -6,6 +6,7 @@ start:
 disconnect:
   loss-seconds: 30
 bet:
-  min-amount: 0.0
+  min-amount: 100.0
+  max-amount: 1000.0
 debug:
   turn-logging: false

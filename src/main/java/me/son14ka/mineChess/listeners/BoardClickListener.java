@@ -26,14 +26,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class BoardClickListener implements Listener {
-    private static final Vector3f HIGHLIGHT_SCALE = new Vector3f(0.25f, 0.25f, 0.25f);
+    private static final Vector3f HIGHLIGHT_SCALE = new Vector3f(0.25f, 0.015f, 0.25f);
 
     private final MineChess plugin;
     private final GameManager gameManager;
@@ -293,12 +292,6 @@ public class BoardClickListener implements Listener {
     private void movePieceEntity(ChessGame game, int fromR, int fromC, int toR, int toC, boolean isCapture, int captureR, int captureC) {
         Location newLoc = game.getOrigin().clone().add(toC / 4.0 + 0.125, 0.137, toR / 4.0 + 0.125);
         newLoc.getWorld().playSound(newLoc, Sound.BLOCK_WOOD_PLACE, 1.0f, 1.0f);
-
-        if (isCapture) {
-            Location captureLoc = game.getOrigin().clone().add(captureC / 4.0 + 0.125, 0.137, captureR / 4.0 + 0.125);
-            captureLoc.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, captureLoc.add(0, 0.1, 0), 10, 0.1, 0.1, 0.1, 0.05);
-            captureLoc.getWorld().playSound(captureLoc, Sound.ENTITY_GENERIC_HURT, 1.0f, 1.0f);
-        }
     }
 
     private void highlightMoves(Player player, ChessGame game, List<Move> moves) {
@@ -329,7 +322,7 @@ public class BoardClickListener implements Listener {
 
             Location loc = game.getOrigin().clone().add(c / 4.0 + 0.125, 0.051, r / 4.0 + 0.125);
 
-            int displayId = playerSpace.spawnItemDisplay(loc, new ItemStack(Material.LIME_STAINED_GLASS_PANE), HIGHLIGHT_SCALE);
+            int displayId = playerSpace.spawnBlockDisplay(loc, Material.LIME_STAINED_GLASS, HIGHLIGHT_SCALE);
             highlights.add(displayId);
         }
         playerSpace.announce();
@@ -509,6 +502,12 @@ public class BoardClickListener implements Listener {
         if (!game.hasBothPlayers()) {
             player.sendMessage(messages.msg(player, "need_opponent"));
             return false;
+        }
+        if (plugin.getEconomy() == null) {
+            game.setStarted(true);
+            game.setWaitingStartSinceMs(0L);
+            if (storage != null) storage.saveGame(game);
+            return true;
         }
         if (!game.areBetsConfirmed()) {
             player.sendMessage(messages.msg(player, "need_bets"));
