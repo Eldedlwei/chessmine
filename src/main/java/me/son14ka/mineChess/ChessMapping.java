@@ -36,6 +36,7 @@ public final class ChessMapping {
             case ROOK -> 4;
             case QUEEN -> 5;
             case KING -> 6;
+            default -> throw new IllegalArgumentException("Unsupported piece type: " + piece.getPieceType());
         };
 
         if (piece.getPieceSide() == Side.BLACK) base += 6;
