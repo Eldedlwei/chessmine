@@ -13,6 +13,7 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
+import java.io.File;
 import java.util.UUID;
 
 public final class MineChess extends JavaPlugin {
@@ -32,9 +33,9 @@ public final class MineChess extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        saveResource("messages_uk.yml", false);
-        saveResource("messages_en.yml", false);
-        saveResource("messages_zh.yml", false);
+        saveResourceIfAbsent("messages_uk.yml");
+        saveResourceIfAbsent("messages_en.yml");
+        saveResourceIfAbsent("messages_zh.yml");
         BOARD_ITEM_KEY = new NamespacedKey(this, "chess_board_item");
         BOOK_ITEM_KEY = new NamespacedKey(this, "chess_book_item");
 
@@ -154,6 +155,12 @@ public final class MineChess extends JavaPlugin {
 
     public MessageService getMessageService() {
         return messageService;
+    }
+
+    private void saveResourceIfAbsent(String resourcePath) {
+        if (!new File(getDataFolder(), resourcePath).exists()) {
+            saveResource(resourcePath, false);
+        }
     }
 
     private void loadGames() {
