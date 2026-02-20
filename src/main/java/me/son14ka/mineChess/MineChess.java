@@ -6,7 +6,6 @@ import me.son14ka.mineChess.listeners.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
@@ -27,8 +26,7 @@ public final class MineChess extends JavaPlugin {
     private Economy economy;
     private BukkitTask viewTask;
     private BoardClickListener boardClickListener;
-    public static NamespacedKey BOARD_ITEM_KEY;
-    public static NamespacedKey BOOK_ITEM_KEY;
+    private MineChessKeys keys;
 
     @Override
     public void onEnable() {
@@ -36,8 +34,7 @@ public final class MineChess extends JavaPlugin {
         saveResourceIfAbsent("messages_uk.yml");
         saveResourceIfAbsent("messages_en.yml");
         saveResourceIfAbsent("messages_zh.yml");
-        BOARD_ITEM_KEY = new NamespacedKey(this, "chess_board_item");
-        BOOK_ITEM_KEY = new NamespacedKey(this, "chess_book_item");
+        keys = new MineChessKeys(this);
 
         gameManager = new GameManager(this);
         renderViewManager = new RenderViewManager(this, gameManager);
@@ -62,9 +59,9 @@ public final class MineChess extends JavaPlugin {
     }
 
     void registerListeners(){
-        getServer().getPluginManager().registerEvents(new BoardInCraftListener(), this);
-        getServer().getPluginManager().registerEvents(new BookClickListener(), this);
-        getServer().getPluginManager().registerEvents(new AvoidInVanillaCraftsListener(), this);
+        getServer().getPluginManager().registerEvents(new BoardInCraftListener(this), this);
+        getServer().getPluginManager().registerEvents(new BookClickListener(this), this);
+        getServer().getPluginManager().registerEvents(new AvoidInVanillaCraftsListener(this), this);
         boardClickListener = new BoardClickListener(this, gameManager, renderViewManager);
         getServer().getPluginManager().registerEvents(boardClickListener, this);
         getServer().getPluginManager().registerEvents(new BoardBreakListener(this, gameManager, renderViewManager),this);
@@ -81,9 +78,9 @@ public final class MineChess extends JavaPlugin {
     }
 
     void registerRecipes(){
-        ItemStack boardIcon = ChessBoardItem.createTemplate();
+        ItemStack boardIcon = ChessBoardItem.createTemplate(keys);
 
-        ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "chess_board"), boardIcon);
+        ShapedRecipe recipe = new ShapedRecipe(keys.chessBoardRecipe(), boardIcon);
         RecipeChoice choices = new RecipeChoice.MaterialChoice(
                 Material.ACACIA_PLANKS, Material.OAK_PLANKS,
                 Material.BAMBOO_PLANKS, Material.CHERRY_PLANKS,
@@ -102,16 +99,16 @@ public final class MineChess extends JavaPlugin {
         recipe.setIngredient('S', Material.STICK);
         Bukkit.addRecipe(recipe);
 
-        ItemStack tutorialItem = ChessBookItem.create();
+        ItemStack tutorialItem = ChessBookItem.create(keys);
 
         ShapelessRecipe tutorialRecipe = new ShapelessRecipe(
-                new NamespacedKey(this, "chess_tutorial_recipe"),
+                keys.chessTutorialRecipe(),
                 tutorialItem
         );
 
         tutorialRecipe.addIngredient(
                 new RecipeChoice.ExactChoice(
-                        ChessBoardItem.createTemplate()));
+                        ChessBoardItem.createTemplate(keys)));
         tutorialRecipe.addIngredient(
                 new RecipeChoice.ExactChoice(
                         ItemStack.of(Material.BOOK)));
@@ -164,6 +161,10 @@ public final class MineChess extends JavaPlugin {
 
     public RenderViewManager getRenderViewManager() {
         return renderViewManager;
+    }
+
+    public MineChessKeys getKeys() {
+        return keys;
     }
 
     private void saveResourceIfAbsent(String resourcePath) {

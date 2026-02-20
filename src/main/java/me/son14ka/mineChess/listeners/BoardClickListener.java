@@ -11,6 +11,7 @@ import me.son14ka.mineChess.BoardGeometry;
 import me.son14ka.mineChess.ChessGame;
 import me.son14ka.mineChess.ChessMapping;
 import me.son14ka.mineChess.GameManager;
+import me.son14ka.mineChess.MineChessKeys;
 import me.son14ka.mineChess.MineChess;
 import me.son14ka.mineChess.RenderViewManager;
 import me.son14ka.mineChess.GameEconomy;
@@ -19,7 +20,6 @@ import me.son14ka.mineChess.PromotionSpawner;
 import me.son14ka.mineChess.MessageService;
 import me.son14ka.mineChess.ViewSpace;
 import org.bukkit.*;
-import org.bukkit.entity.Entity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Interaction;
@@ -29,7 +29,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -41,6 +40,7 @@ public class BoardClickListener implements Listener {
     private final RenderViewManager renderViewManager;
     private final GameStorage storage;
     private final MessageService messages;
+    private final MineChessKeys keys;
 
     private final Map<UUID, int[]> selectedCells = new HashMap<>();
     private final Map<UUID, HighlightSpace> activeHighlights = new HashMap<>();
@@ -52,60 +52,89 @@ public class BoardClickListener implements Listener {
         this.renderViewManager = renderViewManager;
         this.storage = plugin.getGameStorage();
         this.messages = plugin.getMessageService();
+        this.keys = plugin.getKeys();
     }
 
     @EventHandler
     public void onBoardClick(PlayerInteractEntityEvent event) {
         if (!(event.getRightClicked() instanceof Interaction interaction)) return;
-        if (!event.getPlayer().hasPermission("minechess.play")) {
-            event.getPlayer().sendMessage(messages.msg(event.getPlayer(), "no_permission"));
+        Player player = event.getPlayer();
+        if (!player.hasPermission("minechess.play")) {
+            player.sendMessage(messages.msg(player, "no_permission"));
             return;
         }
 
-        var pdc = interaction.getPersistentDataContainer();
-        Player player = event.getPlayer();
-        NamespacedKey promotionKey = new NamespacedKey(plugin, "promotion_cmd");
-
-        if (interaction.getPersistentDataContainer().has(promotionKey, PersistentDataType.INTEGER)) {
-            int cmd = pdc.get(promotionKey, PersistentDataType.INTEGER);
-            int row = pdc.get(new NamespacedKey(plugin, "promotion_row"), PersistentDataType.INTEGER);
-            int col = pdc.get(new NamespacedKey(plugin, "promotion_col"), PersistentDataType.INTEGER);
-            UUID gameId = UUID.fromString(pdc.get(new NamespacedKey(plugin, "game_id"), PersistentDataType.STRING));
-
-            ChessGame game = gameManager.getGame(gameId);
+        PromotionChoiceClick promotionClick = readPromotionChoice(interaction);
+        if (promotionClick != null) {
+            ChessGame game = gameManager.getGame(promotionClick.gameId());
             if (game == null) return;
 
-            completePromotion(game, player, row, col, cmd);
-
-            cleanupPromotionEntities(interaction.getWorld(), gameId);
+            completePromotion(game, player, promotionClick.cmd());
+            PromotionSpawner.cleanupPromotionEntities(plugin, interaction.getWorld(), promotionClick.gameId());
 
             game.setWaitingForPromotion(false);
             game.setPendingPromotion(null);
 
             handlePostMoveState(game, player);
             renderViewManager.refreshGame(game);
-            if (storage != null) storage.saveGame(game);
-        } else {
-            NamespacedKey gameKey = new NamespacedKey(plugin, "game_id");
-            if (!pdc.has(gameKey, PersistentDataType.STRING)) return;
+            saveGame(game);
+            return;
+        }
 
-            UUID gameId = UUID.fromString(pdc.get(gameKey, PersistentDataType.STRING));
-            ChessGame game = gameManager.getGame(gameId);
-            if (game == null) return;
+        BoardCellClick boardClick = readBoardCell(interaction);
+        if (boardClick == null) return;
 
-            if (game.isGameOver()) {
-                event.getPlayer().sendMessage(messages.msg(player, "game_over"));
-                return;
-            }
-            if (game.isWaitingForPromotion()) {
-                event.getPlayer().sendMessage(messages.msg(player, "promotion_choice"));
-                return;
-            }
+        ChessGame game = gameManager.getGame(boardClick.gameId());
+        if (game == null) return;
 
-            int row = pdc.get(new NamespacedKey(plugin, "chess_row"), PersistentDataType.INTEGER);
-            int col = pdc.get(new NamespacedKey(plugin, "chess_col"), PersistentDataType.INTEGER);
+        if (game.isGameOver()) {
+            player.sendMessage(messages.msg(player, "game_over"));
+            return;
+        }
+        if (game.isWaitingForPromotion()) {
+            player.sendMessage(messages.msg(player, "promotion_choice"));
+            return;
+        }
 
-            handleInteraction(player, game, row, col);
+        handleInteraction(player, game, boardClick.row(), boardClick.col());
+    }
+
+    private PromotionChoiceClick readPromotionChoice(Interaction interaction) {
+        var pdc = interaction.getPersistentDataContainer();
+        Integer cmd = pdc.get(keys.promotionCmd(), PersistentDataType.INTEGER);
+        if (cmd == null) {
+            return null;
+        }
+
+        if (!pdc.has(keys.promotionRow(), PersistentDataType.INTEGER)
+                || !pdc.has(keys.promotionCol(), PersistentDataType.INTEGER)) {
+            return null;
+        }
+        String gameId = pdc.get(keys.gameId(), PersistentDataType.STRING);
+        if (gameId == null) {
+            return null;
+        }
+
+        try {
+            return new PromotionChoiceClick(UUID.fromString(gameId), cmd);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+
+    private BoardCellClick readBoardCell(Interaction interaction) {
+        var pdc = interaction.getPersistentDataContainer();
+        Integer row = pdc.get(keys.chessRow(), PersistentDataType.INTEGER);
+        Integer col = pdc.get(keys.chessCol(), PersistentDataType.INTEGER);
+        String gameId = pdc.get(keys.gameId(), PersistentDataType.STRING);
+        if (row == null || col == null || gameId == null) {
+            return null;
+        }
+
+        try {
+            return new BoardCellClick(UUID.fromString(gameId), row, col);
+        } catch (IllegalArgumentException ignored) {
+            return null;
         }
     }
 
@@ -222,7 +251,7 @@ public class BoardClickListener implements Listener {
             game.setWaitingForPromotion(true);
             PromotionSpawner.spawnPromotionChoices(plugin, game, toR, toC, board.getSideToMove() == Side.WHITE);
             renderViewManager.refreshGame(game);
-            if (storage != null) storage.saveGame(game);
+            saveGame(game);
             return;
         }
 
@@ -242,7 +271,7 @@ public class BoardClickListener implements Listener {
 
         handlePostMoveState(game, player);
         renderViewManager.refreshGame(game);
-        if (storage != null) storage.saveGame(game);
+        saveGame(game);
     }
 
     private void spawnVictoryFireworks(Location origin) {
@@ -335,7 +364,7 @@ public class BoardClickListener implements Listener {
     }
 
     private void clearHighlights(Player player) {
-        HighlightSpace highlights = activeHighlights.remove(player.getUniqueId());
+        HighlightSpace highlights = activeHighlights.get(player.getUniqueId());
         if (highlights != null) {
             for (Integer displayId : highlights.displays) {
                 if (displayId != null) {
@@ -343,7 +372,7 @@ public class BoardClickListener implements Listener {
                 }
             }
             highlights.space.announce();
-            activeHighlights.put(player.getUniqueId(), highlights);
+            highlights.displays.clear();
         }
         highlightKeys.remove(player.getUniqueId());
     }
@@ -362,30 +391,7 @@ public class BoardClickListener implements Listener {
         highlightKeys.remove(playerId);
     }
 
-    private void cleanupPromotionEntities(@NotNull World world, UUID gameId) {
-        String idString = gameId.toString();
-        NamespacedKey gameKey = new NamespacedKey(plugin, "game_id");
-        NamespacedKey promoItemKey = new NamespacedKey(plugin, "is_promotion_item");
-        NamespacedKey promoCmdKey = new NamespacedKey(plugin, "promotion_cmd");
-
-        for (Entity entity : world.getEntities()) {
-            var pdc = entity.getPersistentDataContainer();
-
-            if (pdc.has(gameKey, PersistentDataType.STRING)) {
-                String storedId = pdc.get(gameKey, PersistentDataType.STRING);
-
-                if (idString.equals(storedId)) {
-                    if (pdc.has(promoItemKey, PersistentDataType.BYTE) ||
-                            pdc.has(promoCmdKey, PersistentDataType.INTEGER)) {
-
-                        entity.remove();
-                    }
-                }
-            }
-        }
-    }
-
-    private void completePromotion(ChessGame game, Player player, int row, int col, int cmd) {
+    private void completePromotion(ChessGame game, Player player, int cmd) {
         ChessGame.PendingPromotion pending = game.getPendingPromotion();
         if (pending == null) return;
 
@@ -405,7 +411,7 @@ public class BoardClickListener implements Listener {
         game.addIncrement(side);
         debugTurn(game, player, "promotion_applied");
 
-        if (storage != null) storage.saveGame(game);
+        saveGame(game);
     }
 
     private void moveRookForCastle(ChessGame game, int row, int fromCol, int kingToCol) {
@@ -486,7 +492,7 @@ public class BoardClickListener implements Listener {
                 game.setWaitingStartSinceMs(System.currentTimeMillis());
             }
             player.sendMessage(messages.msg(player, "joined_white"));
-            if (storage != null) storage.saveGame(game);
+            saveGame(game);
             return true;
         }
         if (game.getBlackPlayer() == null && !player.getUniqueId().equals(game.getWhitePlayer())) {
@@ -497,7 +503,7 @@ public class BoardClickListener implements Listener {
                 game.setWaitingStartSinceMs(System.currentTimeMillis());
             }
             player.sendMessage(messages.msg(player, "joined_black"));
-            if (storage != null) storage.saveGame(game);
+            saveGame(game);
             return true;
         }
         if (!game.isPlayer(player.getUniqueId())) {
@@ -516,7 +522,7 @@ public class BoardClickListener implements Listener {
         if (plugin.getEconomy() == null) {
             game.setStarted(true);
             game.setWaitingStartSinceMs(0L);
-            if (storage != null) storage.saveGame(game);
+            saveGame(game);
             return true;
         }
         if (!game.areBetsConfirmed()) {
@@ -531,8 +537,14 @@ public class BoardClickListener implements Listener {
         }
         game.setStarted(true);
         game.setWaitingStartSinceMs(0L);
-        if (storage != null) storage.saveGame(game);
+        saveGame(game);
         return true;
+    }
+
+    private void saveGame(ChessGame game) {
+        if (storage != null) {
+            storage.saveGame(game);
+        }
     }
 
     private long getInitialTimeMs() {
@@ -566,6 +578,12 @@ public class BoardClickListener implements Listener {
             Square from = moves.get(0).getFrom();
             return new HighlightKey(game.getBoard().getFen(), from);
         }
+    }
+
+    private record PromotionChoiceClick(UUID gameId, int cmd) {
+    }
+
+    private record BoardCellClick(UUID gameId, int row, int col) {
     }
 
     public static Component getMsg(Player player, String path, MineChess plugin) {

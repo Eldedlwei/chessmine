@@ -1,7 +1,6 @@
 package me.son14ka.mineChess;
 
 import org.bukkit.Location;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Interaction;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -12,6 +11,7 @@ public final class BoardSpawner {
     }
 
     public static void spawnInteractionCells(MineChess plugin, Location baseLoc, UUID gameId) {
+        MineChessKeys keys = plugin.getKeys();
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 final int cellRow = row;
@@ -22,9 +22,9 @@ public final class BoardSpawner {
                     interaction.setInteractionHeight(BoardGeometry.INTERACTION_HEIGHT);
 
                     var pdc = interaction.getPersistentDataContainer();
-                    pdc.set(new NamespacedKey(plugin, "chess_row"), PersistentDataType.INTEGER, cellRow);
-                    pdc.set(new NamespacedKey(plugin, "chess_col"), PersistentDataType.INTEGER, cellCol);
-                    pdc.set(new NamespacedKey(plugin, "game_id"), PersistentDataType.STRING, gameId.toString());
+                    pdc.set(keys.chessRow(), PersistentDataType.INTEGER, cellRow);
+                    pdc.set(keys.chessCol(), PersistentDataType.INTEGER, cellCol);
+                    pdc.set(keys.gameId(), PersistentDataType.STRING, gameId.toString());
                 });
             }
         }

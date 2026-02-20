@@ -1,6 +1,7 @@
 package me.son14ka.mineChess.listeners;
 
 import me.son14ka.mineChess.MineChess;
+import me.son14ka.mineChess.MineChessKeys;
 import me.son14ka.mineChess.items.ChessBoardItem;
 import me.son14ka.mineChess.items.ChessBookItem;
 import org.bukkit.Keyed;
@@ -13,6 +14,11 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.persistence.PersistentDataType;
 
 public class BoardInCraftListener implements Listener {
+    private final MineChessKeys keys;
+
+    public BoardInCraftListener(MineChess plugin) {
+        this.keys = plugin.getKeys();
+    }
 
     @EventHandler
     public void onPrepareCraft(PrepareItemCraftEvent event) {
@@ -20,15 +26,15 @@ public class BoardInCraftListener implements Listener {
         if (recipe == null || event.getViewers().isEmpty()) return;
 
         if (recipe instanceof Keyed keyed) {
-            String recipeKey = keyed.getKey().getKey();
+            var recipeKey = keyed.getKey();
 
-            if (recipeKey.equals("chess_board")) {
-                event.getInventory().setResult(ChessBoardItem.createTemplate());
+            if (recipeKey.equals(keys.chessBoardRecipe())) {
+                event.getInventory().setResult(ChessBoardItem.createTemplate(keys));
             }
 
-            else if (recipeKey.equals("chess_tutorial_recipe")) {
+            else if (recipeKey.equals(keys.chessTutorialRecipe())) {
                 if (isCustomBoardPresent(event.getInventory().getMatrix())) {
-                    event.getInventory().setResult(ChessBookItem.create());
+                    event.getInventory().setResult(ChessBookItem.create(keys));
                 } else {
                     event.getInventory().setResult(null);
                 }
@@ -39,7 +45,7 @@ public class BoardInCraftListener implements Listener {
     private boolean isCustomBoardPresent(ItemStack[] matrix) {
         for (ItemStack item : matrix) {
             if (item != null && item.getType() == Material.ITEM_FRAME) {
-                if (item.getPersistentDataContainer().has(MineChess.BOARD_ITEM_KEY, PersistentDataType.BYTE)) {
+                if (item.getPersistentDataContainer().has(keys.boardItem(), PersistentDataType.BYTE)) {
                     return true;
                 }
             }

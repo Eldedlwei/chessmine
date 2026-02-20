@@ -63,22 +63,19 @@ public class GameManager {
 
     public void cleanupGame(UUID gameId, Location loc) {
         activeGames.remove(gameId);
-
-        loc.getWorld().getNearbyEntities(loc, 3, 2, 3).forEach(entity -> {
+        String targetId = gameId.toString();
+        NamespacedKey key = plugin.getKeys().gameId();
+        for (Entity entity : loc.getWorld().getEntities()) {
             var pdc = entity.getPersistentDataContainer();
-            NamespacedKey key = new NamespacedKey(plugin, "game_id");
-
-            if (pdc.has(key, PersistentDataType.STRING)) {
-                String idStr = pdc.get(key, PersistentDataType.STRING);
-                if (idStr != null && idStr.equals(gameId.toString())) {
-                    entity.remove();
-                }
+            String idStr = pdc.get(key, PersistentDataType.STRING);
+            if (targetId.equals(idStr)) {
+                entity.remove();
             }
-        });
+        }
     }
 
     public void resetGame(ChessGame game) {
-        cleanupPromotionEntities(game);
+        PromotionSpawner.cleanupPromotionEntities(plugin, game.getOrigin().getWorld(), game.getGameId());
         game.resetForNextMatch();
 
         if (plugin.getRenderViewManager() != null) {
@@ -86,24 +83,6 @@ public class GameManager {
         }
         if (plugin.getGameStorage() != null) {
             plugin.getGameStorage().saveGame(game);
-        }
-    }
-
-    private void cleanupPromotionEntities(ChessGame game) {
-        NamespacedKey gameKey = new NamespacedKey(plugin, "game_id");
-        NamespacedKey promoItemKey = new NamespacedKey(plugin, "is_promotion_item");
-        NamespacedKey promoCmdKey = new NamespacedKey(plugin, "promotion_cmd");
-        String targetGameId = game.getGameId().toString();
-
-        for (Entity entity : game.getOrigin().getWorld().getEntities()) {
-            var pdc = entity.getPersistentDataContainer();
-            String gameId = pdc.get(gameKey, PersistentDataType.STRING);
-            if (!targetGameId.equals(gameId)) {
-                continue;
-            }
-            if (pdc.has(promoItemKey, PersistentDataType.BYTE) || pdc.has(promoCmdKey, PersistentDataType.INTEGER)) {
-                entity.remove();
-            }
         }
     }
 

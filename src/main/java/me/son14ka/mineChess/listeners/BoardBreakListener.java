@@ -1,6 +1,7 @@
 package me.son14ka.mineChess.listeners;
 
 import me.son14ka.mineChess.MineChess;
+import me.son14ka.mineChess.MineChessKeys;
 import me.son14ka.mineChess.GameManager;
 import me.son14ka.mineChess.RenderViewManager;
 import me.son14ka.mineChess.items.ChessBoardItem;
@@ -21,11 +22,13 @@ import java.util.UUID;
 public class BoardBreakListener implements Listener {
 
     private final MineChess plugin;
+    private final MineChessKeys keys;
     private final GameManager gameManager;
     private final RenderViewManager renderViewManager;
 
     public BoardBreakListener(MineChess plugin, GameManager gameManager, RenderViewManager renderViewManager) {
         this.plugin = plugin;
+        this.keys = plugin.getKeys();
         this.gameManager = gameManager;
         this.renderViewManager = renderViewManager;
     }
@@ -36,7 +39,7 @@ public class BoardBreakListener implements Listener {
         if (!(event.getDamager() instanceof Player player)) return;
 
         var pdc = interaction.getPersistentDataContainer();
-        NamespacedKey gameIdKey = new NamespacedKey(plugin, "game_id");
+        NamespacedKey gameIdKey = keys.gameId();
 
         if (pdc.has(gameIdKey, PersistentDataType.STRING)) {
             event.setCancelled(true);
@@ -56,7 +59,7 @@ public class BoardBreakListener implements Listener {
                         plugin.getGameStorage().deleteGame(gameId);
                     }
 
-                    player.getWorld().dropItemNaturally(interaction.getLocation(), ChessBoardItem.createTemplate());
+                    player.getWorld().dropItemNaturally(interaction.getLocation(), ChessBoardItem.createTemplate(keys));
                 }
             }
         }
@@ -69,11 +72,11 @@ public class BoardBreakListener implements Listener {
         ItemStack containedItem = frame.getItem();
         if (containedItem.getType() == Material.AIR) return;
 
-        if (containedItem.getPersistentDataContainer().has(MineChess.BOARD_ITEM_KEY, PersistentDataType.BYTE)) {
+        if (containedItem.getPersistentDataContainer().has(keys.boardItem(), PersistentDataType.BYTE)) {
 
             event.setCancelled(true);
 
-            ItemStack drop = ChessBoardItem.createTemplate();
+            ItemStack drop = ChessBoardItem.createTemplate(keys);
 
             frame.setItem(null);
 

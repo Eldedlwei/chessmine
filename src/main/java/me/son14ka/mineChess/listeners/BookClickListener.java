@@ -1,6 +1,7 @@
 package me.son14ka.mineChess.listeners;
 
 import me.son14ka.mineChess.MineChess;
+import me.son14ka.mineChess.MineChessKeys;
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -14,6 +15,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class BookClickListener implements Listener {
+    private final MineChessKeys keys;
+
+    public BookClickListener(MineChess plugin) {
+        this.keys = plugin.getKeys();
+    }
+
     @EventHandler
     public void onUse(PlayerInteractEvent e) {
         if (!e.getAction().isRightClick()) return;
@@ -22,7 +29,7 @@ public class BookClickListener implements Listener {
         ItemMeta meta = e.getItem().getItemMeta();
         if (meta == null) return;
 
-        if (!meta.getPersistentDataContainer().has(MineChess.BOOK_ITEM_KEY, PersistentDataType.BYTE))
+        if (!meta.getPersistentDataContainer().has(keys.bookItem(), PersistentDataType.BYTE))
             return;
 
         e.setCancelled(true);

@@ -1,6 +1,6 @@
 package me.son14ka.mineChess.items;
 
-import me.son14ka.mineChess.MineChess;
+import me.son14ka.mineChess.MineChessKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ChessBookItem {
 
-    public static ItemStack create() {
+    public static ItemStack create(MineChessKeys keys) {
         ItemStack book = new ItemStack(Material.BOOK);
         ItemMeta meta = book.getItemMeta();
 
@@ -26,7 +26,7 @@ public class ChessBookItem {
                     .decoration(TextDecoration.ITALIC, false)
                     .color(NamedTextColor.YELLOW));
 
-            meta.getPersistentDataContainer().set(MineChess.BOOK_ITEM_KEY, PersistentDataType.BYTE, (byte) 1);
+            meta.getPersistentDataContainer().set(keys.bookItem(), PersistentDataType.BYTE, (byte) 1);
             book.setItemMeta(meta);
         }
         return book;
