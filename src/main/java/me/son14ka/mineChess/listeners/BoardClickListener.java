@@ -336,7 +336,11 @@ public class BoardClickListener implements Listener {
     private void clearHighlights(Player player) {
         HighlightSpace highlights = activeHighlights.remove(player.getUniqueId());
         if (highlights != null) {
-            highlights.displays.forEach(highlights.space::destroy);
+            for (Integer displayId : highlights.displays) {
+                if (displayId != null) {
+                    highlights.space.destroy(displayId);
+                }
+            }
             highlights.space.announce();
             activeHighlights.put(player.getUniqueId(), highlights);
         }
@@ -346,7 +350,11 @@ public class BoardClickListener implements Listener {
     public void closeHighlights(UUID playerId) {
         HighlightSpace highlights = activeHighlights.remove(playerId);
         if (highlights != null) {
-            highlights.displays.forEach(highlights.space::destroy);
+            for (Integer displayId : highlights.displays) {
+                if (displayId != null) {
+                    highlights.space.destroy(displayId);
+                }
+            }
             highlights.space.announce();
             highlights.space.close();
         }
@@ -419,7 +427,7 @@ public class BoardClickListener implements Listener {
             Component msg;
             if (isMated) {
                 Side winnerSide = board.getSideToMove() == Side.WHITE ? Side.BLACK : Side.WHITE;
-                Player winnerPlayer = plugin.getServer().getPlayer(game.getPlayer(winnerSide));
+                Player winnerPlayer = getOnlinePlayer(game.getPlayer(winnerSide));
                 Component winner = winnerPlayer != null
                         ? Component.text(winnerPlayer.getName())
                         : (winnerSide == Side.WHITE ? messages.msg(player, "white") : messages.msg(player, "black"));
@@ -532,6 +540,13 @@ public class BoardClickListener implements Listener {
 
     private long getIncrementMs() {
         return plugin.getConfig().getLong("clock.increment-seconds", 3L) * 1000L;
+    }
+
+    private Player getOnlinePlayer(UUID playerId) {
+        if (playerId == null) {
+            return null;
+        }
+        return plugin.getServer().getPlayer(playerId);
     }
 
     private static final class HighlightSpace {

@@ -1,6 +1,7 @@
 clock:
   initial-seconds: 300
   increment-seconds: 3
+  bossbar-enabled: true
 start:
   wait-seconds: 60
 disconnect:

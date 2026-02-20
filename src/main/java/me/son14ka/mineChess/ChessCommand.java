@@ -107,10 +107,6 @@ public class ChessCommand implements CommandExecutor, TabCompleter {
                 ));
                 return true;
             }
-            if (!plugin.getEconomy().has(player, amount)) {
-                player.sendMessage(plugin.getMessageService().msg(player, "bet_insufficient"));
-                return true;
-            }
             ChessGame game = gameManager.getNearestGame(player.getLocation(), 4.0);
             if (game == null) {
                 player.sendMessage(plugin.getMessageService().msg(player, "no_game"));
@@ -125,12 +121,9 @@ public class ChessCommand implements CommandExecutor, TabCompleter {
                 player.sendMessage(plugin.getMessageService().msg(player, "bet_locked"));
                 return true;
             }
-            if (side == com.github.bhlangonijr.chesslib.Side.WHITE) {
-                game.setWhiteBet(amount);
-                game.setWhiteBetConfirmed(true);
-            } else {
-                game.setBlackBet(amount);
-                game.setBlackBetConfirmed(true);
+            if (!GameEconomy.placeOrUpdateBet(plugin, game, side, amount)) {
+                player.sendMessage(plugin.getMessageService().msg(player, "bet_insufficient"));
+                return true;
             }
             storage.saveGame(game);
             player.sendMessage(plugin.getMessageService().msg(player, "bet_set", Placeholder.unparsed("amount", String.valueOf(amount))));

@@ -125,6 +125,9 @@ public final class MineChess extends JavaPlugin {
             viewTask.cancel();
             viewTask = null;
         }
+        if (gameClockManager != null) {
+            gameClockManager.stop();
+        }
         if (gameStorage != null) {
             for (ChessGame game : gameManager.getActiveGames()) {
                 gameStorage.saveGame(game);

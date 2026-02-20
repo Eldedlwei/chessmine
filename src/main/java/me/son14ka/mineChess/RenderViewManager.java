@@ -208,22 +208,30 @@ public class RenderViewManager {
         private Map<Integer, PieceRender> buildTargetRenders(ChessGame game) {
             Map<Integer, PieceRender> target = new HashMap<>();
             ChessGame.PendingPromotion pending = game.getPendingPromotion();
-            int[] pendingFrom = null;
-            int[] pendingTo = null;
+            int pendingFromRow = -1;
+            int pendingFromCol = -1;
+            int pendingToRow = -1;
+            int pendingToCol = -1;
+            Side pendingSide = null;
             if (pending != null) {
-                pendingFrom = ChessMapping.toCoords(pending.from());
-                pendingTo = ChessMapping.toCoords(pending.to());
+                int[] pendingFrom = ChessMapping.toCoords(pending.from());
+                int[] pendingTo = ChessMapping.toCoords(pending.to());
+                pendingFromRow = pendingFrom[0];
+                pendingFromCol = pendingFrom[1];
+                pendingToRow = pendingTo[0];
+                pendingToCol = pendingTo[1];
+                pendingSide = pending.side();
             }
 
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
                     Piece piece = game.getBoard().getPiece(ChessMapping.toSquare(row, col));
 
-                    if (pending != null) {
-                        if (row == pendingFrom[0] && col == pendingFrom[1]) {
+                    if (pendingSide != null) {
+                        if (row == pendingFromRow && col == pendingFromCol) {
                             piece = Piece.NONE;
-                        } else if (row == pendingTo[0] && col == pendingTo[1]) {
-                            piece = pending.side() == Side.WHITE ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
+                        } else if (row == pendingToRow && col == pendingToCol) {
+                            piece = pendingSide == Side.WHITE ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
                         }
                     }
 
