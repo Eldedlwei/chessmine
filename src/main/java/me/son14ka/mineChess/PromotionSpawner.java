@@ -16,13 +16,13 @@ public final class PromotionSpawner {
     }
 
     public static void spawnPromotionChoices(MineChess plugin, ChessGame game, int row, int col, boolean isWhite) {
-        Location baseLoc = game.getOrigin().clone().add(col / 4.0 + 0.125, 1.0, row / 4.0 + 0.125);
+        Location baseLoc = BoardGeometry.promotionBase(game.getOrigin(), row, col);
 
         int[] types = {5, 4, 3, 2};
         if (!isWhite) { for (int i = 0; i < 4; i++) types[i] += 6; }
 
         for (int i = 0; i < 4; i++) {
-            Location choiceLoc = baseLoc.clone().add((i - 1.5) * 0.4, 0, 0);
+            Location choiceLoc = BoardGeometry.promotionChoice(baseLoc, i);
             int cmd = types[i];
 
             choiceLoc.getWorld().spawn(choiceLoc, ItemDisplay.class, display -> {
@@ -42,9 +42,9 @@ public final class PromotionSpawner {
                 display.getPersistentDataContainer().set(new NamespacedKey(plugin, "game_id"), PersistentDataType.STRING, game.getGameId().toString());
             });
 
-            choiceLoc.getWorld().spawn(choiceLoc.clone().add(0, -0.15, 0), Interaction.class, inter -> {
-                inter.setInteractionWidth(0.25f);
-                inter.setInteractionHeight(0.6f);
+            choiceLoc.getWorld().spawn(choiceLoc.clone().add(0, BoardGeometry.PROMOTION_INTERACTION_Y_OFFSET, 0), Interaction.class, inter -> {
+                inter.setInteractionWidth(BoardGeometry.PROMOTION_INTERACTION_WIDTH);
+                inter.setInteractionHeight(BoardGeometry.PROMOTION_INTERACTION_HEIGHT);
 
                 var pdc = inter.getPersistentDataContainer();
                 pdc.set(new NamespacedKey(plugin, "promotion_cmd"), PersistentDataType.INTEGER, cmd);

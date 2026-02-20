@@ -1,7 +1,6 @@
 clock:
   initial-seconds: 300
   increment-seconds: 3
-  bossbar-enabled: true
 start:
   wait-seconds: 60
 disconnect:
@@ -11,3 +10,69 @@ bet:
   max-amount: 1000.0
 debug:
   turn-logging: false
+piece:
+  king:
+    white: 0.5
+    black: 0.5
+  queen:
+    white: 0.5
+    black: 0.5
+  rook:
+    white: 0.6
+    black: 0.6
+  bishop:
+    white: 0.6
+    black: 0.6
+  knight:
+    white: 0.5
+    black: 0.5
+  pawn:
+    white: 0.8
+    black: 0.8
+  default:
+    white: 0.25
+    black: 0.25
+rotation: # 1-4
+  king:
+    white: 0
+    black: 0
+  queen:
+    white: 0
+    black: 0
+  rook:
+    white: 0
+    black: 0
+  bishop:
+    white: 0
+    black: 0
+  knight:
+    white: 0
+    black: 2
+  pawn:
+    white: 0
+    black: 0
+  default:
+    white: 0
+    black: 0
+offset:
+  king:
+    white: 0.22
+    black: 0.22
+  queen:
+    white: 0.22
+    black: 0.22
+  rook:
+    white: 0.262
+    black: 0.262
+  bishop:
+    white: 0.26
+    black: 0.26
+  knight:
+    white: 0.21
+    black: 0.21
+  pawn:
+    white: 0.36
+    black: 0.36
+  default:
+    white: 0.0
+    black: 0.0

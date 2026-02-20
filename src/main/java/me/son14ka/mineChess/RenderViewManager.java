@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 
 import java.util.*;
 
@@ -131,16 +132,17 @@ public class RenderViewManager {
     }
 
     private static final class PlayerView {
+        private final MineChess plugin;
         private final ViewSpace space;
         private final List<Integer> boardDisplays = new ArrayList<>();
         private final Map<Integer, Integer> pieceDisplays = new HashMap<>();
         private final Map<Integer, PieceRender> pieceRenders = new HashMap<>();
         private String lastFen;
         private String lastPendingKey;
-        private static final Vector3f BOARD_SCALE = new Vector3f(0.25f, 0.05f, 0.25f);
-        private static final Vector3f PIECE_SCALE = new Vector3f(0.25f, 0.25f, 0.25f);
+        private static final Vector3f BOARD_SCALE = new Vector3f((float) BoardGeometry.CELL_SIZE, 0.1f, (float) BoardGeometry.CELL_SIZE);
 
         private PlayerView(MineChess plugin, Player player) {
+            this.plugin = plugin;
             this.space = new ViewSpace(plugin, player);
         }
 
@@ -148,8 +150,8 @@ public class RenderViewManager {
             Location baseLoc = game.getOrigin();
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
-                    Location cellLoc = baseLoc.clone().add(col / 4.0, 0, row / 4.0);
-                    Material material = (row + col) % 2 == 0 ? Material.BIRCH_PLANKS : Material.DARK_OAK_PLANKS;
+                    Location cellLoc = BoardGeometry.cellCorner(baseLoc, row, col);
+                    Material material = (row + col) % 2 == 0 ? Material.WHITE_CONCRETE : Material.BLACK_CONCRETE;
                     int displayId = space.spawnBlockDisplay(cellLoc, material, BOARD_SCALE);
                     boardDisplays.add(displayId);
                 }
@@ -248,26 +250,24 @@ public class RenderViewManager {
 
         private PieceRender toRender(Piece piece) {
             int cmd = ChessMapping.toModelData(piece);
-            float yaw;
-            if (cmd == 2) yaw = -90f;
-            else if (cmd == 8) yaw = 90f;
-            else yaw = piece.getPieceSide() == Side.WHITE ? 0f : 180f;
-            return new PieceRender(cmd, yaw);
+            PieceVisuals.Visual visual = PieceVisuals.resolve(plugin, piece);
+            return new PieceRender(cmd, visual.yawDegrees(), visual.yOffset(), visual.scale());
         }
 
         private int spawnPiece(ChessGame game, int row, int col, PieceRender render) {
-            Location loc = game.getOrigin().clone().add(col / 4.0 + 0.125, 0.137, row / 4.0 + 0.125);
+            Location loc = BoardGeometry.cellCenter(game.getOrigin(), row, col, BoardGeometry.PIECE_BASE_Y + render.yOffset());
             loc.setYaw(render.yaw());
 
             ItemStack item = new ItemStack(Material.TORCH);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                var modelData = meta.getCustomModelDataComponent();
+                CustomModelDataComponent modelData = meta.getCustomModelDataComponent();
                 modelData.setFloats(List.of((float) render.cmd()));
                 meta.setCustomModelDataComponent(modelData);
                 item.setItemMeta(meta);
             }
-            return space.spawnItemDisplay(loc, item, PIECE_SCALE);
+            Vector3f scale = new Vector3f(render.scale(), render.scale(), render.scale());
+            return space.spawnItemDisplay(loc, item, scale);
         }
 
         private void announce() {
@@ -288,7 +288,7 @@ public class RenderViewManager {
             space.close();
         }
 
-        private record PieceRender(int cmd, float yaw) {
+        private record PieceRender(int cmd, float yaw, double yOffset, float scale) {
         }
     }
 }
