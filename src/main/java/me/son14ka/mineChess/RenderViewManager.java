@@ -131,16 +131,17 @@ public class RenderViewManager {
     }
 
     private static final class PlayerView {
+        private final MineChess plugin;
         private final ViewSpace space;
         private final List<Integer> boardDisplays = new ArrayList<>();
         private final Map<Integer, Integer> pieceDisplays = new HashMap<>();
         private final Map<Integer, PieceRender> pieceRenders = new HashMap<>();
         private String lastFen;
         private String lastPendingKey;
-        private static final Vector3f BOARD_SCALE = new Vector3f(0.25f, 0.05f, 0.25f);
-        private static final Vector3f PIECE_SCALE = new Vector3f(0.25f, 0.25f, 0.25f);
+        private static final Vector3f BOARD_SCALE = new Vector3f(0.5f, 0.1f, 0.5f);
 
         private PlayerView(MineChess plugin, Player player) {
+            this.plugin = plugin;
             this.space = new ViewSpace(plugin, player);
         }
 
@@ -148,8 +149,8 @@ public class RenderViewManager {
             Location baseLoc = game.getOrigin();
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
-                    Location cellLoc = baseLoc.clone().add(col / 4.0, 0, row / 4.0);
-                    Material material = (row + col) % 2 == 0 ? Material.BIRCH_PLANKS : Material.DARK_OAK_PLANKS;
+                    Location cellLoc = baseLoc.clone().add(col / 2.0, 0, row / 2.0);
+                    Material material = (row + col) % 2 == 0 ? Material.WHITE_CONCRETE : Material.BLACK_CONCRETE;
                     int displayId = space.spawnBlockDisplay(cellLoc, material, BOARD_SCALE);
                     boardDisplays.add(displayId);
                 }
@@ -240,15 +241,13 @@ public class RenderViewManager {
 
         private PieceRender toRender(Piece piece) {
             int cmd = ChessMapping.toModelData(piece);
-            float yaw;
-            if (cmd == 2) yaw = -90f;
-            else if (cmd == 8) yaw = 90f;
-            else yaw = piece.getPieceSide() == Side.WHITE ? 0f : 180f;
-            return new PieceRender(cmd, yaw);
+            float yaw = getPieceRotation(piece);
+            double yOffset = getPieceYOffset(piece);
+            return new PieceRender(cmd, yaw, yOffset);
         }
 
         private int spawnPiece(ChessGame game, int row, int col, PieceRender render) {
-            Location loc = game.getOrigin().clone().add(col / 4.0 + 0.125, 0.137, row / 4.0 + 0.125);
+            Location loc = game.getOrigin().clone().add(col / 2.0 + 0.25, 0.137 + render.yOffset() , row / 2.0 + 0.25);
             loc.setYaw(render.yaw());
 
             ItemStack item = new ItemStack(Material.TORCH);
@@ -259,7 +258,8 @@ public class RenderViewManager {
                 meta.setCustomModelDataComponent(modelData);
                 item.setItemMeta(meta);
             }
-            return space.spawnItemDisplay(loc, item, PIECE_SCALE);
+            Vector3f scale = getPieceScaleByType(render.cmd());
+            return space.spawnItemDisplay(loc, item, scale);
         }
 
         private void announce() {
@@ -280,7 +280,53 @@ public class RenderViewManager {
             space.close();
         }
 
-        private record PieceRender(int cmd, float yaw) {
+        private record PieceRender(int cmd, float yaw, double yOffset) {
+        }
+        private   Vector3f getPieceScaleByType(int pieceType) {
+            boolean isWhite = pieceType <= 6;
+            int baseType = isWhite ? pieceType : pieceType - 6;
+            String configPath = switch (baseType) {
+                case 1 -> isWhite? "piece.pawn.white" : "piece.pawn.black";
+                case 2 -> isWhite ? "piece.knight.white" : "piece.knight.black";
+                case 3 -> isWhite ? "piece.bishop.white" : "piece.bishop.black";
+                case 4 -> isWhite ? "piece.rook.white" : "piece.rook.black";
+                case 5 -> isWhite ? "piece.queen.white" : "piece.queen.black";
+                case 6 -> isWhite ? "piece.king.white" : "piece.king.black";
+                default -> isWhite ? "piece.default.white" : "piece.default.black";
+            };
+            double scale = plugin.getConfig().getDouble(configPath,0.25);
+            return new Vector3f((float) scale, (float) scale, (float) scale);
+        }
+        private float getPieceRotation(Piece piece) {
+            int pieceType = ChessMapping.toModelData(piece);
+            boolean isWhite = piece.getPieceSide() == Side.WHITE;
+            int baseType = isWhite ? pieceType : pieceType - 6;
+            String configPath = switch (baseType) {
+                case 1 -> isWhite ? "rotation.pawn.white" : "rotation.pawn.black";
+                case 2 -> isWhite ? "rotation.knight.white" : "rotation.knight.black";
+                case 3 -> isWhite ? "rotation.bishop.white" : "rotation.bishop.black";
+                case 4 -> isWhite ? "rotation.rook.white" : "rotation.rook.black";
+                case 5 -> isWhite ? "rotation.queen.white" : "rotation.queen.black";
+                case 6 -> isWhite ? "rotation.king.white" : "rotation.king.black";
+                default -> "rotation.default";
+            };
+            int rotation = plugin.getConfig().getInt(configPath, 0);
+            return rotation * 90f;
+        }
+        private double getPieceYOffset(Piece piece) {
+            int pieceType = ChessMapping.toModelData(piece);
+            boolean isWhite = piece.getPieceSide() == Side.WHITE;
+            int baseType = isWhite ? pieceType : pieceType - 6;
+            String configPath = switch (baseType) {
+                case 1 -> isWhite ? "offset.pawn.white" : "offset.pawn.black";
+                case 2 -> isWhite ? "offset.knight.white" : "offset.knight.black";
+                case 3 -> isWhite ? "offset.bishop.white" : "offset.bishop.black";
+                case 4 -> isWhite ? "offset.rook.white" : "offset.rook.black";
+                case 5 -> isWhite ? "offset.queen.white" : "offset.queen.black";
+                case 6 -> isWhite ? "offset.king.white" : "offset.king.black";
+                default -> "offset.default";
+            };
+            return plugin.getConfig().getDouble(configPath, 0.0);
         }
     }
 }

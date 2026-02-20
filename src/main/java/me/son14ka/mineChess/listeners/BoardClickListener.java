@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class BoardClickListener implements Listener {
-    private static final Vector3f HIGHLIGHT_SCALE = new Vector3f(0.25f, 0.25f, 0.25f);
+    private static final Vector3f HIGHLIGHT_SCALE = new Vector3f(0.5f, 0.5f, 0.5f);
 
     private final MineChess plugin;
     private final GameManager gameManager;
@@ -291,7 +291,7 @@ public class BoardClickListener implements Listener {
     }
 
     private void movePieceEntity(ChessGame game, int fromR, int fromC, int toR, int toC, boolean isCapture, int captureR, int captureC) {
-        Location newLoc = game.getOrigin().clone().add(toC / 4.0 + 0.125, 0.137, toR / 4.0 + 0.125);
+        Location newLoc = game.getOrigin().clone().add(toC / 2.0 + 0.25, 0.137, toR / 2.0 + 0.25);
         newLoc.getWorld().playSound(newLoc, Sound.BLOCK_WOOD_PLACE, 1.0f, 1.0f);
     }
 
@@ -321,7 +321,7 @@ public class BoardClickListener implements Listener {
             int r = coords[0];
             int c = coords[1];
 
-            Location loc = game.getOrigin().clone().add(c / 4.0 + 0.125, 0.051, r / 4.0 + 0.125);
+            Location loc = game.getOrigin().clone().add(c / 2.0 + 0.25, 0.1, r / 2.0 + 0.25);
             loc.setPitch(90f);
             int displayId = playerSpace.spawnItemDisplay(loc, new ItemStack(Material.LIME_STAINED_GLASS_PANE), HIGHLIGHT_SCALE);
             highlights.add(displayId);

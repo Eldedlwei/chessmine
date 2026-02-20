@@ -16,10 +16,10 @@ public final class BoardSpawner {
             for (int col = 0; col < 8; col++) {
                 final int cellRow = row;
                 final int cellCol = col;
-                Location cellLoc = baseLoc.clone().add(col / 4.0 + 0.125, 0.05, row / 4.0 + 0.125);
+                Location cellLoc = baseLoc.clone().add(col / 2.0 + 0.25, 0.1, row / 2.0 + 0.25);
                 baseLoc.getWorld().spawn(cellLoc, Interaction.class, interaction -> {
-                    interaction.setInteractionWidth(0.25f);
-                    interaction.setInteractionHeight(0.05f);
+                    interaction.setInteractionWidth(0.5f);
+                    interaction.setInteractionHeight(0.2f);
 
                     var pdc = interaction.getPersistentDataContainer();
                     pdc.set(new NamespacedKey(plugin, "chess_row"), PersistentDataType.INTEGER, cellRow);
