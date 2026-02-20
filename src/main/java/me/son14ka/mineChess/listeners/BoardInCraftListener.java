@@ -11,12 +11,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
-import org.bukkit.persistence.PersistentDataType;
 
 public class BoardInCraftListener implements Listener {
+    private final MineChess plugin;
     private final MineChessKeys keys;
 
     public BoardInCraftListener(MineChess plugin) {
+        this.plugin = plugin;
         this.keys = plugin.getKeys();
     }
 
@@ -29,12 +30,12 @@ public class BoardInCraftListener implements Listener {
             var recipeKey = keyed.getKey();
 
             if (recipeKey.equals(keys.chessBoardRecipe())) {
-                event.getInventory().setResult(ChessBoardItem.createTemplate(keys));
+                event.getInventory().setResult(ChessBoardItem.createTemplate(plugin));
             }
 
             else if (recipeKey.equals(keys.chessTutorialRecipe())) {
                 if (isCustomBoardPresent(event.getInventory().getMatrix())) {
-                    event.getInventory().setResult(ChessBookItem.create(keys));
+                    event.getInventory().setResult(ChessBookItem.create(plugin));
                 } else {
                     event.getInventory().setResult(null);
                 }
@@ -44,10 +45,8 @@ public class BoardInCraftListener implements Listener {
 
     private boolean isCustomBoardPresent(ItemStack[] matrix) {
         for (ItemStack item : matrix) {
-            if (item != null && item.getType() == Material.ITEM_FRAME) {
-                if (item.getPersistentDataContainer().has(keys.boardItem(), PersistentDataType.BYTE)) {
-                    return true;
-                }
+            if (item != null && item.getType() == Material.ITEM_FRAME && ChessBoardItem.isBoardItem(plugin, item)) {
+                return true;
             }
         }
         return false;

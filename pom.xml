@@ -13,6 +13,7 @@
 
     <properties>
         <java.version>21</java.version>
+        <craftengine.version>0.0.67</craftengine.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -67,6 +68,10 @@
             <id>jitpack</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>momirealms-releases</id>
+            <url>https://repo.momirealms.net/releases/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -96,6 +101,18 @@
             <groupId>com.github.retrooper</groupId>
             <artifactId>packetevents-spigot</artifactId>
             <version>2.11.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.momirealms</groupId>
+            <artifactId>craft-engine-core</artifactId>
+            <version>${craftengine.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.momirealms</groupId>
+            <artifactId>craft-engine-bukkit</artifactId>
+            <version>${craftengine.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

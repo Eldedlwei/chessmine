@@ -3,29 +3,24 @@ package me.son14ka.mineChess.listeners;
 import me.son14ka.mineChess.ChessGame;
 import me.son14ka.mineChess.GameManager;
 import me.son14ka.mineChess.MineChess;
-import me.son14ka.mineChess.MineChessKeys;
 import me.son14ka.mineChess.RenderViewManager;
 import me.son14ka.mineChess.BoardSpawner;
+import me.son14ka.mineChess.items.ChessBoardItem;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 public class BoardPlaceListener implements Listener {
 
     private final MineChess plugin;
-    private final MineChessKeys keys;
-
     private final GameManager gameManager;
     private final RenderViewManager renderViewManager;
 
     public BoardPlaceListener(MineChess plugin, GameManager gameManager, RenderViewManager renderViewManager) {
         this.plugin = plugin;
-        this.keys = plugin.getKeys();
         this.gameManager = gameManager;
         this.renderViewManager = renderViewManager;
     }
@@ -39,11 +34,7 @@ public class BoardPlaceListener implements Listener {
             return;
         }
 
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return;
-        var key = keys.boardItem();
-
-        if (meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
+        if (ChessBoardItem.isBoardItem(plugin, item)) {
             event.getEntity().remove();
 
             Location startLoc = event.getBlock().getLocation();

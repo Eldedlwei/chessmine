@@ -353,7 +353,11 @@ public class BoardClickListener implements Listener {
 
             Location loc = BoardGeometry.cellCenter(game.getOrigin(), r, c, BoardGeometry.HIGHLIGHT_Y);
             loc.setPitch(90f);
-            int displayId = playerSpace.spawnItemDisplay(loc, new ItemStack(Material.LIME_STAINED_GLASS_PANE), HIGHLIGHT_SCALE);
+            ItemStack highlightItem = plugin.getCraftEngineItems().createHighlightItem();
+            if (highlightItem == null) {
+                highlightItem = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
+            }
+            int displayId = playerSpace.spawnItemDisplay(loc, highlightItem, HIGHLIGHT_SCALE);
             highlights.add(displayId);
         }
         playerSpace.announce();

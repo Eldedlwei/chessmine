@@ -76,3 +76,24 @@ offset:
   default:
     white: 0.0
     black: 0.0
+craft-engine:
+  enabled: false
+  items:
+    board: minechess:board
+    book: minechess:tutorial_book
+    highlight: minechess:highlight
+    pieces:
+      white:
+        pawn: minechess:white_pawn
+        knight: minechess:white_knight
+        bishop: minechess:white_bishop
+        rook: minechess:white_rook
+        queen: minechess:white_queen
+        king: minechess:white_king
+      black:
+        pawn: minechess:black_pawn
+        knight: minechess:black_knight
+        bishop: minechess:black_bishop
+        rook: minechess:black_rook
+        queen: minechess:black_queen
+        king: minechess:black_king

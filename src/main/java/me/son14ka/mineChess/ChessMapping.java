@@ -65,4 +65,19 @@ public final class ChessMapping {
             default -> null;
         };
     }
+
+    public static Piece toPiece(Side side, PieceType type) {
+        if (side == null || type == null) {
+            return Piece.NONE;
+        }
+        return switch (type) {
+            case PAWN -> side == Side.WHITE ? Piece.WHITE_PAWN : Piece.BLACK_PAWN;
+            case KNIGHT -> side == Side.WHITE ? Piece.WHITE_KNIGHT : Piece.BLACK_KNIGHT;
+            case BISHOP -> side == Side.WHITE ? Piece.WHITE_BISHOP : Piece.BLACK_BISHOP;
+            case ROOK -> side == Side.WHITE ? Piece.WHITE_ROOK : Piece.BLACK_ROOK;
+            case QUEEN -> side == Side.WHITE ? Piece.WHITE_QUEEN : Piece.BLACK_QUEEN;
+            case KING -> side == Side.WHITE ? Piece.WHITE_KING : Piece.BLACK_KING;
+            default -> Piece.NONE;
+        };
+    }
 }

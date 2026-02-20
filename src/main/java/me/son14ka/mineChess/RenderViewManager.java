@@ -7,8 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 
 import java.util.*;
 
@@ -251,20 +249,23 @@ public class RenderViewManager {
         private PieceRender toRender(Piece piece) {
             int cmd = ChessMapping.toModelData(piece);
             PieceVisuals.Visual visual = PieceVisuals.resolve(plugin, piece);
-            return new PieceRender(cmd, visual.yawDegrees(), visual.yOffset(), visual.scale());
+            return new PieceRender(piece, cmd, visual.yawDegrees(), visual.yOffset(), visual.scale());
         }
 
         private int spawnPiece(ChessGame game, int row, int col, PieceRender render) {
             Location loc = BoardGeometry.cellCenter(game.getOrigin(), row, col, BoardGeometry.PIECE_BASE_Y + render.yOffset());
             loc.setYaw(render.yaw());
 
-            ItemStack item = new ItemStack(Material.TORCH);
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null) {
-                CustomModelDataComponent modelData = meta.getCustomModelDataComponent();
-                modelData.setFloats(List.of((float) render.cmd()));
-                meta.setCustomModelDataComponent(modelData);
-                item.setItemMeta(meta);
+            ItemStack item = plugin.getCraftEngineItems().createPieceItem(render.piece());
+            if (item == null) {
+                item = new ItemStack(Material.TORCH);
+                var meta = item.getItemMeta();
+                if (meta != null) {
+                    var modelData = meta.getCustomModelDataComponent();
+                    modelData.setFloats(List.of((float) render.cmd()));
+                    meta.setCustomModelDataComponent(modelData);
+                    item.setItemMeta(meta);
+                }
             }
             Vector3f scale = new Vector3f(render.scale(), render.scale(), render.scale());
             return space.spawnItemDisplay(loc, item, scale);
@@ -288,7 +289,7 @@ public class RenderViewManager {
             space.close();
         }
 
-        private record PieceRender(int cmd, float yaw, double yOffset, float scale) {
+        private record PieceRender(Piece piece, int cmd, float yaw, double yOffset, float scale) {
         }
     }
 }

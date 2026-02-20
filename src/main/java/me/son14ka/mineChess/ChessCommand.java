@@ -72,6 +72,7 @@ public class ChessCommand implements CommandExecutor, TabCompleter {
             }
             plugin.reloadConfig();
             plugin.getMessageService().reload();
+            plugin.refreshCraftEngineIntegration();
             player.sendMessage(plugin.getMessageService().msg(player, "reload_done"));
             return true;
         }

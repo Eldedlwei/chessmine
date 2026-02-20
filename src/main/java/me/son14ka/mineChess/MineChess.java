@@ -23,10 +23,12 @@ public final class MineChess extends JavaPlugin {
     private GameClockManager gameClockManager;
     private GameStorage gameStorage;
     private MessageService messageService;
+    private CraftEngineItemService craftEngineItemService;
     private Economy economy;
     private BukkitTask viewTask;
     private BoardClickListener boardClickListener;
     private MineChessKeys keys;
+    private boolean craftEngineReloadListenerRegistered;
 
     @Override
     public void onEnable() {
@@ -39,6 +41,8 @@ public final class MineChess extends JavaPlugin {
         gameManager = new GameManager(this);
         renderViewManager = new RenderViewManager(this, gameManager);
         messageService = new MessageService(this);
+        craftEngineItemService = new CraftEngineItemService(this);
+        craftEngineReloadListenerRegistered = false;
         setupEconomy();
         gameStorage = new GameStorage(getDataFolder());
         try {
@@ -69,6 +73,7 @@ public final class MineChess extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerViewListener(renderViewManager), this);
         getServer().getPluginManager().registerEvents(new PlayerSessionListener(this, gameManager, gameStorage), this);
         getServer().getPluginManager().registerEvents(new HighlightCleanupListener(boardClickListener), this);
+        registerCraftEngineReloadListenerIfNeeded();
         var cmd = getCommand("chess");
         if (cmd != null) {
             ChessCommand chessCommand = new ChessCommand(this, gameManager, gameStorage);
@@ -78,7 +83,7 @@ public final class MineChess extends JavaPlugin {
     }
 
     void registerRecipes(){
-        ItemStack boardIcon = ChessBoardItem.createTemplate(keys);
+        ItemStack boardIcon = ChessBoardItem.createTemplate(this);
 
         ShapedRecipe recipe = new ShapedRecipe(keys.chessBoardRecipe(), boardIcon);
         RecipeChoice choices = new RecipeChoice.MaterialChoice(
@@ -99,7 +104,7 @@ public final class MineChess extends JavaPlugin {
         recipe.setIngredient('S', Material.STICK);
         Bukkit.addRecipe(recipe);
 
-        ItemStack tutorialItem = ChessBookItem.create(keys);
+        ItemStack tutorialItem = ChessBookItem.create(this);
 
         ShapelessRecipe tutorialRecipe = new ShapelessRecipe(
                 keys.chessTutorialRecipe(),
@@ -107,11 +112,9 @@ public final class MineChess extends JavaPlugin {
         );
 
         tutorialRecipe.addIngredient(
-                new RecipeChoice.ExactChoice(
-                        ChessBoardItem.createTemplate(keys)));
+                Material.ITEM_FRAME);
         tutorialRecipe.addIngredient(
-                new RecipeChoice.ExactChoice(
-                        ItemStack.of(Material.BOOK)));
+                Material.BOOK);
 
         Bukkit.addRecipe(tutorialRecipe);
     }
@@ -159,12 +162,36 @@ public final class MineChess extends JavaPlugin {
         return messageService;
     }
 
+    public CraftEngineItemService getCraftEngineItems() {
+        return craftEngineItemService;
+    }
+
     public RenderViewManager getRenderViewManager() {
         return renderViewManager;
     }
 
     public MineChessKeys getKeys() {
         return keys;
+    }
+
+    public GameManager getGameManager() {
+        return gameManager;
+    }
+
+    public void refreshCraftEngineIntegration() {
+        if (craftEngineItemService == null) {
+            return;
+        }
+        craftEngineItemService.reload();
+        registerCraftEngineReloadListenerIfNeeded();
+    }
+
+    private void registerCraftEngineReloadListenerIfNeeded() {
+        if (craftEngineReloadListenerRegistered || craftEngineItemService == null || !craftEngineItemService.isUsingCraftEngine()) {
+            return;
+        }
+        getServer().getPluginManager().registerEvents(new CraftEngineReloadListener(this), this);
+        craftEngineReloadListenerRegistered = true;
     }
 
     private void saveResourceIfAbsent(String resourcePath) {

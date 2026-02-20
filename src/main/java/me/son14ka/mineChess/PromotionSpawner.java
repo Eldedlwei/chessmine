@@ -1,5 +1,6 @@
 package me.son14ka.mineChess;
 
+import com.github.bhlangonijr.chesslib.Side;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -10,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Transformation;
 
-import java.util.List;
 import java.util.UUID;
 
 public final class PromotionSpawner {
@@ -31,15 +31,18 @@ public final class PromotionSpawner {
             int cmd = types[i];
 
             choiceLoc.getWorld().spawn(choiceLoc, ItemDisplay.class, display -> {
-                ItemStack item = new ItemStack(Material.TORCH);
-                var meta = item.getItemMeta();
-                if (meta == null) {
-                    return;
+                ItemStack item = plugin.getCraftEngineItems().createPromotionChoiceItem(cmd, isWhite ? Side.WHITE : Side.BLACK);
+                if (item == null) {
+                    item = new ItemStack(Material.TORCH);
+                    var meta = item.getItemMeta();
+                    if (meta == null) {
+                        return;
+                    }
+                    var modelData = meta.getCustomModelDataComponent();
+                    modelData.setFloats(java.util.List.of((float) cmd));
+                    meta.setCustomModelDataComponent(modelData);
+                    item.setItemMeta(meta);
                 }
-                var modelData = meta.getCustomModelDataComponent();
-                modelData.setFloats(List.of((float) cmd));
-                meta.setCustomModelDataComponent(modelData);
-                item.setItemMeta(meta);
                 display.setItemStack(item);
 
                 Transformation trafo = display.getTransformation();

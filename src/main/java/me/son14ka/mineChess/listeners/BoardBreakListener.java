@@ -59,7 +59,7 @@ public class BoardBreakListener implements Listener {
                         plugin.getGameStorage().deleteGame(gameId);
                     }
 
-                    player.getWorld().dropItemNaturally(interaction.getLocation(), ChessBoardItem.createTemplate(keys));
+                    player.getWorld().dropItemNaturally(interaction.getLocation(), ChessBoardItem.createTemplate(plugin));
                 }
             }
         }
@@ -72,11 +72,11 @@ public class BoardBreakListener implements Listener {
         ItemStack containedItem = frame.getItem();
         if (containedItem.getType() == Material.AIR) return;
 
-        if (containedItem.getPersistentDataContainer().has(keys.boardItem(), PersistentDataType.BYTE)) {
+        if (ChessBoardItem.isBoardItem(plugin, containedItem)) {
 
             event.setCancelled(true);
 
-            ItemStack drop = ChessBoardItem.createTemplate(keys);
+            ItemStack drop = ChessBoardItem.createTemplate(plugin);
 
             frame.setItem(null);
 

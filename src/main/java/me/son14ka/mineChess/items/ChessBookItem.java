@@ -1,5 +1,6 @@
 package me.son14ka.mineChess.items;
 
+import me.son14ka.mineChess.MineChess;
 import me.son14ka.mineChess.MineChessKeys;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,7 +14,14 @@ import java.util.List;
 
 public class ChessBookItem {
 
-    public static ItemStack create(MineChessKeys keys) {
+    public static ItemStack create(MineChess plugin) {
+        MineChessKeys keys = plugin.getKeys();
+        ItemStack ceItem = plugin.getCraftEngineItems().createTutorialBookItem();
+        if (ceItem != null) {
+            markBookItem(ceItem, keys);
+            return ceItem;
+        }
+
         ItemStack book = new ItemStack(Material.BOOK);
         ItemMeta meta = book.getItemMeta();
 
@@ -26,9 +34,36 @@ public class ChessBookItem {
                     .decoration(TextDecoration.ITALIC, false)
                     .color(NamedTextColor.YELLOW));
 
-            meta.getPersistentDataContainer().set(keys.bookItem(), PersistentDataType.BYTE, (byte) 1);
+            markBookItemMeta(meta, keys);
             book.setItemMeta(meta);
         }
         return book;
+    }
+
+    public static boolean isBookItem(MineChess plugin, ItemStack item) {
+        if (item == null || item.getType().isAir()) {
+            return false;
+        }
+        if (plugin.getCraftEngineItems().isTutorialBookItem(item)) {
+            return true;
+        }
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            return false;
+        }
+        return meta.getPersistentDataContainer().has(plugin.getKeys().bookItem(), PersistentDataType.BYTE);
+    }
+
+    private static void markBookItem(ItemStack item, MineChessKeys keys) {
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            return;
+        }
+        markBookItemMeta(meta, keys);
+        item.setItemMeta(meta);
+    }
+
+    private static void markBookItemMeta(ItemMeta meta, MineChessKeys keys) {
+        meta.getPersistentDataContainer().set(keys.bookItem(), PersistentDataType.BYTE, (byte) 1);
     }
 }

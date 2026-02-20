@@ -1,24 +1,22 @@
 package me.son14ka.mineChess.listeners;
 
 import me.son14ka.mineChess.MineChess;
-import me.son14ka.mineChess.MineChessKeys;
+import me.son14ka.mineChess.items.ChessBookItem;
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class BookClickListener implements Listener {
-    private final MineChessKeys keys;
+    private final MineChess plugin;
 
     public BookClickListener(MineChess plugin) {
-        this.keys = plugin.getKeys();
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -26,10 +24,7 @@ public class BookClickListener implements Listener {
         if (!e.getAction().isRightClick()) return;
         if (e.getItem() == null) return;
 
-        ItemMeta meta = e.getItem().getItemMeta();
-        if (meta == null) return;
-
-        if (!meta.getPersistentDataContainer().has(keys.bookItem(), PersistentDataType.BYTE))
+        if (!ChessBookItem.isBookItem(plugin, e.getItem()))
             return;
 
         e.setCancelled(true);
